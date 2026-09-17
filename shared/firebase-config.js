@@ -52,5 +52,5 @@ window.FIREBASE_CONFIG = {
 // your Realtime Database security rules (see comments above), since anyone
 // can read this file.
 window.ADMIN_EMAILS = [
-  // "you@example.com"
+  "yawensha16@gmail.com"
 ];
