@@ -20,14 +20,14 @@
     <p class="admin-note">
       Editing here changes the puzzle for <strong>everyone</strong>, starting the next time each
       person loads a page fresh &mdash; anyone already mid-puzzle today keeps the version they
-      started with. Each box holds one JSON array; <strong>Save</strong> is disabled until the
-      text parses as valid JSON.
+      started with.
     </p>
 
+    <!-- WORDLE -->
     <section class="editor-block">
       <h2>Wordle &mdash; answer words</h2>
-      <p class="hint">Array of 5-letter words. This is the pool the daily/random answer is picked from (the much larger accepted-guess dictionary is not admin-editable &mdash; it lives in <code>data/wordle/guesses/</code>).</p>
-      <textarea id="wordleEditor" spellcheck="false"></textarea>
+      <p class="hint">One 5-letter word per line. This is the pool the daily/random answer is picked from (the much larger accepted-guess dictionary is not admin-editable &mdash; it lives in <code>data/wordle/guesses/</code>).</p>
+      <textarea id="wordleWords" class="word-list" spellcheck="false" placeholder="CRANE&#10;SLATE&#10;TRAIN&#10;HOUSE"></textarea>
       <div class="editor-actions">
         <button class="primary" data-game="wordle" data-action="load">Load current</button>
         <button class="primary" data-game="wordle" data-action="save">Save for everyone</button>
@@ -35,10 +35,12 @@
       </div>
     </section>
 
+    <!-- STRANDS -->
     <section class="editor-block">
       <h2>Strands &mdash; puzzles</h2>
-      <p class="hint">Array of <code>{ theme, spangram, words }</code> objects. <code>spangram</code> plus each word in <code>words</code> must be placeable on a grid (the game generates the letter layout automatically).</p>
-      <textarea id="strandsEditor" spellcheck="false"></textarea>
+      <p class="hint">Each puzzle needs a theme name, a spangram (the long word/phrase spanning the board), and a handful of other themed words. Plain words only &mdash; no spaces or punctuation. The board layout is generated automatically.</p>
+      <div id="strandsCards"></div>
+      <button class="secondary" id="addStrandsPuzzle" type="button">+ Add puzzle</button>
       <div class="editor-actions">
         <button class="primary" data-game="strands" data-action="load">Load current</button>
         <button class="primary" data-game="strands" data-action="save">Save for everyone</button>
@@ -46,10 +48,15 @@
       </div>
     </section>
 
+    <!-- CROSSWORD -->
     <section class="editor-block">
       <h2>Crossword &mdash; clue database</h2>
-      <p class="hint">Array of <code>{ word, clue }</code> objects. Longer, harder words become the puzzle's anchors; include some shorter words too so the generator has room to intersect them.</p>
-      <textarea id="crosswordEditor" spellcheck="false"></textarea>
+      <p class="hint">A word plus its clue. Include some long/hard words (they anchor the grid) and some short ones (they fill in intersections).</p>
+      <div class="cw-row cw-row-header">
+        <span>Word</span><span>Clue</span><span></span>
+      </div>
+      <div id="crosswordRows"></div>
+      <button class="secondary" id="addCrosswordRow" type="button">+ Add word</button>
       <div class="editor-actions">
         <button class="primary" data-game="crossword" data-action="load">Load current</button>
         <button class="primary" data-game="crossword" data-action="save">Save for everyone</button>
@@ -66,9 +73,7 @@
 <script>
   const gate = document.getElementById("gate");
   const editors = document.getElementById("editors");
-
   const FIELD = { wordle: "answers", strands: "puzzles", crossword: "clues" };
-  const EDITOR_ID = { wordle: "wordleEditor", strands: "strandsEditor", crossword: "crosswordEditor" };
   const STATUS_ID = { wordle: "wordleStatus", strands: "strandsStatus", crossword: "crosswordStatus" };
 
   function setStatus(game, text, isError) {
@@ -77,30 +82,114 @@
     el.style.color = isError ? "var(--mark)" : "var(--ink-soft)";
   }
 
-  function validate(game) {
-    const ta = document.getElementById(EDITOR_ID[game]);
-    try {
-      const parsed = JSON.parse(ta.value);
-      if (!Array.isArray(parsed)) throw new Error("Must be a JSON array");
-      return parsed;
-    } catch (e) {
-      setStatus(game, "Invalid JSON: " + e.message, true);
-      return null;
-    }
+  // ---------- Wordle: textarea, one word per line ----------
+  function getWordleValue() {
+    const lines = document.getElementById("wordleWords").value.split(/[\n,]+/);
+    const words = lines.map(w => w.trim().toUpperCase()).filter(Boolean);
+    const bad = words.filter(w => w.length !== 5 || !/^[A-Z]+$/.test(w));
+    if (bad.length) throw new Error("Not 5-letter words: " + bad.slice(0, 5).join(", "));
+    if (!words.length) throw new Error("Add at least one word");
+    return words;
   }
+  function setWordleValue(words) {
+    document.getElementById("wordleWords").value = (words || []).join("\n");
+  }
+
+  // ---------- Strands: repeatable puzzle cards ----------
+  const strandsCards = document.getElementById("strandsCards");
+  function addStrandsCard(puzzle) {
+    puzzle = puzzle || { theme: "", spangram: "", words: [] };
+    const card = document.createElement("div");
+    card.className = "repeat-card";
+    card.innerHTML =
+      '<button class="remove-btn" type="button" title="Remove this puzzle">&times;</button>' +
+      '<label>Theme name<input type="text" class="theme-input" placeholder="Kitchen Tools"></label>' +
+      '<label>Spangram<input type="text" class="spangram-input" placeholder="COOKWARE"></label>' +
+      '<label>Other words (one per line)<textarea class="words-input" rows="4" placeholder="SPATULA&#10;WHISK&#10;LADLE&#10;GRATER&#10;SKILLET&#10;TONGS"></textarea></label>';
+    card.querySelector(".theme-input").value = puzzle.theme || "";
+    card.querySelector(".spangram-input").value = (puzzle.spangram || "").toUpperCase();
+    card.querySelector(".words-input").value = (puzzle.words || []).join("\n");
+    card.querySelector(".remove-btn").addEventListener("click", () => card.remove());
+    strandsCards.appendChild(card);
+  }
+  document.getElementById("addStrandsPuzzle").addEventListener("click", () => addStrandsCard());
+
+  function getStrandsValue() {
+    const cards = [...strandsCards.querySelectorAll(".repeat-card")];
+    if (!cards.length) throw new Error("Add at least one puzzle");
+    return cards.map((card, i) => {
+      const theme = card.querySelector(".theme-input").value.trim();
+      const spangram = card.querySelector(".spangram-input").value.trim().toUpperCase();
+      const words = card.querySelector(".words-input").value.split(/[\n,]+/).map(w => w.trim().toUpperCase()).filter(Boolean);
+      if (!theme) throw new Error("Puzzle #" + (i + 1) + " needs a theme name");
+      if (!spangram || !/^[A-Z]+$/.test(spangram)) throw new Error("Puzzle #" + (i + 1) + " needs a valid spangram (letters only)");
+      if (words.length < 3) throw new Error("Puzzle #" + (i + 1) + " needs at least 3 other words");
+      if (words.some(w => !/^[A-Z]+$/.test(w))) throw new Error("Puzzle #" + (i + 1) + " has a word with non-letter characters");
+      return { theme, spangram, words };
+    });
+  }
+  function setStrandsValue(puzzles) {
+    strandsCards.innerHTML = "";
+    (puzzles && puzzles.length ? puzzles : [null]).forEach(addStrandsCard);
+  }
+
+  // ---------- Crossword: repeatable word/clue rows ----------
+  const crosswordRows = document.getElementById("crosswordRows");
+  function addCrosswordRow(entry) {
+    entry = entry || { word: "", clue: "" };
+    const row = document.createElement("div");
+    row.className = "cw-row";
+    row.innerHTML =
+      '<input type="text" class="word-input" placeholder="MONUMENTAL">' +
+      '<input type="text" class="clue-input" placeholder="Of great importance or size">' +
+      '<button class="remove-btn" type="button" title="Remove this word">&times;</button>';
+    row.querySelector(".word-input").value = (entry.word || "").toUpperCase();
+    row.querySelector(".clue-input").value = entry.clue || "";
+    row.querySelector(".remove-btn").addEventListener("click", () => row.remove());
+    crosswordRows.appendChild(row);
+  }
+  document.getElementById("addCrosswordRow").addEventListener("click", () => addCrosswordRow());
+
+  function getCrosswordValue() {
+    const rows = [...crosswordRows.querySelectorAll(".cw-row")];
+    if (!rows.length) throw new Error("Add at least one word");
+    return rows.map((row, i) => {
+      const word = row.querySelector(".word-input").value.trim().toUpperCase();
+      const clue = row.querySelector(".clue-input").value.trim();
+      if (!word || !/^[A-Z]+$/.test(word)) throw new Error("Row #" + (i + 1) + " needs a word (letters only)");
+      if (!clue) throw new Error("Row #" + (i + 1) + " (" + word + ") needs a clue");
+      return { word, clue };
+    });
+  }
+  function setCrosswordValue(entries) {
+    crosswordRows.innerHTML = "";
+    (entries && entries.length ? entries : [null]).forEach(addCrosswordRow);
+  }
+
+  const GETTERS = { wordle: getWordleValue, strands: getStrandsValue, crossword: getCrosswordValue };
+  const SETTERS = { wordle: setWordleValue, strands: setStrandsValue, crossword: setCrosswordValue };
 
   async function loadGame(game) {
     setStatus(game, "Loading...");
-    const snapshot = await firebase.database().ref("puzzles/" + game).once("value");
-    const data = snapshot.val();
-    const value = data ? data[FIELD[game]] : null;
-    document.getElementById(EDITOR_ID[game]).value = value ? JSON.stringify(value, null, 2) : "[]";
-    setStatus(game, value ? "Loaded current shared puzzle." : "No shared puzzle saved yet — starting blank.");
+    try {
+      const snapshot = await firebase.database().ref("puzzles/" + game).once("value");
+      const data = snapshot.val();
+      const value = data ? data[FIELD[game]] : null;
+      SETTERS[game](value);
+      setStatus(game, value ? "Loaded current shared puzzle." : "No shared puzzle saved yet — starting blank.");
+    } catch (e) {
+      setStatus(game, "Load failed: " + e.message + " (check your Realtime Database security rules)", true);
+    }
   }
 
   async function saveGame(game) {
-    const parsed = validate(game);
-    if (!parsed) return;
+    let parsed;
+    try {
+      parsed = GETTERS[game]();
+    } catch (e) {
+      setStatus(game, e.message, true);
+      return;
+    }
     setStatus(game, "Saving...");
     try {
       await firebase.database().ref("puzzles/" + game).set({ [FIELD[game]]: parsed, updatedAt: Date.now() });
@@ -117,6 +206,10 @@
       else saveGame(game);
     });
   });
+
+  // Start each section with one blank card/row so the page isn't empty.
+  addStrandsCard();
+  addCrosswordRow();
 
   function showGate(message) {
     gate.style.display = "block";

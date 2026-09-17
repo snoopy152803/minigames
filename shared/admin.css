@@ -28,5 +28,92 @@
   color: var(--ink);
   resize: vertical;
 }
+.editor-block textarea.word-list { min-height: 160px; }
 .editor-actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
 .editor-status { font-size: 13px; color: var(--ink-soft); }
+
+button.secondary {
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px dashed var(--border);
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 13px;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+button.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+.repeat-card {
+  position: relative;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 16px 40px 16px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--paper);
+}
+.repeat-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.repeat-card input[type="text"],
+.repeat-card textarea {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 8px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--panel);
+  color: var(--ink);
+}
+.repeat-card textarea { resize: vertical; }
+
+.remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+.remove-btn:hover { background: var(--mark); color: #fff; }
+
+.cw-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 32px;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.cw-row-header {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.cw-row input[type="text"] {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  padding: 8px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  width: 100%;
+}
+.cw-row .remove-btn { position: static; }
