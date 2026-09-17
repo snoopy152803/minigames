@@ -60,7 +60,7 @@
 </main>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <script src="shared/firebase-config.js"></script>
 <script src="shared/auth.js"></script>
 <script>
@@ -91,10 +91,11 @@
 
   async function loadGame(game) {
     setStatus(game, "Loading...");
-    const doc = await firebase.firestore().collection("puzzles").doc(game).get();
-    const data = doc.exists ? doc.data()[FIELD[game]] : null;
-    document.getElementById(EDITOR_ID[game]).value = data ? JSON.stringify(data, null, 2) : "[]";
-    setStatus(game, data ? "Loaded current shared puzzle." : "No shared puzzle saved yet — starting blank.");
+    const snapshot = await firebase.database().ref("puzzles/" + game).once("value");
+    const data = snapshot.val();
+    const value = data ? data[FIELD[game]] : null;
+    document.getElementById(EDITOR_ID[game]).value = value ? JSON.stringify(value, null, 2) : "[]";
+    setStatus(game, value ? "Loaded current shared puzzle." : "No shared puzzle saved yet — starting blank.");
   }
 
   async function saveGame(game) {
@@ -102,10 +103,10 @@
     if (!parsed) return;
     setStatus(game, "Saving...");
     try {
-      await firebase.firestore().collection("puzzles").doc(game).set({ [FIELD[game]]: parsed, updatedAt: Date.now() });
+      await firebase.database().ref("puzzles/" + game).set({ [FIELD[game]]: parsed, updatedAt: Date.now() });
       setStatus(game, "Saved. Everyone gets this the next time they load a fresh page.");
     } catch (e) {
-      setStatus(game, "Save failed: " + e.message + " (check your Firestore security rules)", true);
+      setStatus(game, "Save failed: " + e.message + " (check your Realtime Database security rules)", true);
     }
   }
 
@@ -124,7 +125,7 @@
   }
 
   if (!window.PuzzleAuth.isConfigured()) {
-    showGate("Firebase hasn't been configured yet. Fill in shared/firebase-config.js with your project's keys, enable Email/Password sign-in, and create a Firestore database, then reload this page.");
+    showGate("Firebase hasn't been configured yet. Fill in shared/firebase-config.js with your project's keys, enable Email/Password sign-in, and create a Realtime Database, then reload this page.");
   } else {
     window.PuzzleAuth.onChange((user) => {
       if (!user) {

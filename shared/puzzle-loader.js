@@ -1,7 +1,7 @@
 // Lets admin.html change the puzzle content for everyone by editing a
-// Firestore document, while people already playing today's puzzle keep the
-// version they started with (we only re-check Firestore once per calendar
-// day, per browser).
+// Realtime Database node, while people already playing today's puzzle keep
+// the version they started with (we only re-check the database once per
+// calendar day, per browser).
 //
 // If Firebase isn't configured yet, ready() resolves immediately and every
 // game just uses whatever's bundled in data/ — nothing breaks.
@@ -40,9 +40,9 @@ window.PuzzleData = (function () {
           return;
         }
       }
-      const doc = await firebase.firestore().collection("puzzles").doc(game).get();
-      if (doc.exists) {
-        const data = doc.data();
+      const snapshot = await firebase.database().ref("puzzles/" + game).once("value");
+      const data = snapshot.val();
+      if (data) {
         localStorage.setItem(cacheKey(game), JSON.stringify({ day: todayKey(), data }));
         applyOverride(game, data);
       }

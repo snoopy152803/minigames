@@ -2,7 +2,9 @@
 // page: if shared/firebase-config.js hasn't been filled in yet, everything
 // here becomes a no-op instead of throwing.
 window.PuzzleAuth = (function () {
-  const configured = window.FIREBASE_CONFIG && window.FIREBASE_CONFIG.apiKey !== "REPLACE_ME";
+  const configured = window.FIREBASE_CONFIG
+    && window.FIREBASE_CONFIG.apiKey !== "REPLACE_ME"
+    && window.FIREBASE_CONFIG.databaseURL !== "REPLACE_ME";
   let app = null;
 
   if (configured && window.firebase) {
