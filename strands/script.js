@@ -1,4 +1,4 @@
-(function () {
+window.PuzzleData.ready("strands").then(function () {
   const gridEl = document.getElementById("grid");
   const themeBox = document.getElementById("themeBox");
   const progressEl = document.getElementById("progress");
@@ -7,7 +7,9 @@
 
   let board = null;
   let foundWords = new Set();
-  let selecting = false;
+  let selecting = false;   // a selection sequence is in progress (may span multiple taps)
+  let dragging = false;    // pointer button is currently held down
+  let dragMoved = false;   // pointer moved to a different cell since the last pointerdown
   let selectedPath = [];
   let cellEls = [];
 
@@ -105,6 +107,8 @@
     return a.every((rc, i) => rc[0] === b[i][0] && rc[1] === b[i][1]);
   }
 
+  // Returns true if the current selectedPath exactly matches an unfound word
+  // (forwards or backwards) and, if so, marks it found and resets selection.
   function checkSelection() {
     const reversed = selectedPath.slice().reverse();
     const candidates = [board.spangram, ...board.words].filter(w => !foundWords.has(w));
@@ -120,6 +124,7 @@
         if (foundWords.size === board.words.length + 1) {
           setTimeout(() => toast("Puzzle complete!", 3000), 400);
         }
+        resetSelection();
         return true;
       }
     }
@@ -127,16 +132,27 @@
   }
 
   function clearSelectionStyles() {
-    selectedPath.forEach(([r, c]) => cellEls[r][c].classList.remove("selecting"));
+    selectedPath.forEach(([r, c]) => cellEls[r][c] && cellEls[r][c].classList.remove("selecting"));
   }
 
-  function startSelect(r, c) {
+  function resetSelection() {
+    clearSelectionStyles();
+    selecting = false;
+    selectedPath = [];
+    lineLayer.innerHTML = "";
+  }
+
+  function startSelection(r, c) {
+    resetSelection();
     selecting = true;
     selectedPath = [[r, c]];
     cellEls[r][c].classList.add("selecting");
     drawLine();
   }
 
+  // Shared by both drag-move and tap-to-extend: try to grow (or shrink, via
+  // backtrack) the in-progress path onto cell (r,c). Auto-submits the moment
+  // the path matches a solution.
   function extendSelect(r, c) {
     if (!selecting) return;
     const last = selectedPath[selectedPath.length - 1];
@@ -153,15 +169,31 @@
     selectedPath.push([r, c]);
     cellEls[r][c].classList.add("selecting");
     drawLine();
+    if (selectedPath.length >= 3) checkSelection();
   }
 
-  function endSelect() {
-    if (!selecting) return;
-    selecting = false;
-    if (selectedPath.length >= 3) checkSelection();
-    clearSelectionStyles();
-    selectedPath = [];
-    lineLayer.innerHTML = "";
+  // Click/tap handling: a tap on the current last cell submits the
+  // selection; a tap elsewhere extends (or restarts) it. This lets a word be
+  // built with a series of individual taps instead of one continuous drag.
+  function tapCell(r, c) {
+    if (!selecting) {
+      startSelection(r, c);
+      return;
+    }
+    const last = selectedPath[selectedPath.length - 1];
+    if (last[0] === r && last[1] === c) {
+      if (selectedPath.length >= 3 && !checkSelection()) {
+        toast("Not a valid word");
+        resetSelection();
+      }
+      return;
+    }
+    const wasAdjacent = isAdjacent(last, [r, c]) || selectedPath.some(rc => rc[0] === r && rc[1] === c);
+    if (!wasAdjacent) {
+      startSelection(r, c);
+      return;
+    }
+    extendSelect(r, c);
   }
 
   function cellFromPoint(x, y) {
@@ -173,14 +205,30 @@
   function attachEvents() {
     gridEl.onpointerdown = (e) => {
       const rc = cellFromPoint(e.clientX, e.clientY);
-      if (rc) startSelect(rc[0], rc[1]);
+      if (!rc) return;
+      dragging = true;
+      dragMoved = false;
+      tapCell(rc[0], rc[1]);
     };
     gridEl.onpointermove = (e) => {
-      if (!selecting) return;
+      if (!dragging || !selecting) return;
       const rc = cellFromPoint(e.clientX, e.clientY);
-      if (rc) extendSelect(rc[0], rc[1]);
+      if (!rc) return;
+      const last = selectedPath[selectedPath.length - 1];
+      if (last[0] === rc[0] && last[1] === rc[1]) return;
+      dragMoved = true;
+      extendSelect(rc[0], rc[1]);
     };
-    window.onpointerup = () => endSelect();
+    window.onpointerup = () => {
+      if (dragging && dragMoved && selecting) {
+        // A drag always resolves on release: either it matched (checkSelection
+        // inside extendSelect already reset it) or it didn't, in which case
+        // we clear it like the real game does.
+        resetSelection();
+      }
+      dragging = false;
+      dragMoved = false;
+    };
   }
 
   document.getElementById("hintBtn").addEventListener("click", () => {
@@ -196,4 +244,4 @@
   });
 
   buildBoard();
-})();
+});

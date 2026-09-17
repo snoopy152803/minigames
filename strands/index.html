@@ -11,6 +11,7 @@
 <header class="topbar">
   <a class="home-link" href="../index.html">&larr; Hub</a>
   <h1>STRANDS</h1>
+  <div id="authWidget" class="auth-widget"></div>
   <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New puzzle</button>
 </header>
 <main>
@@ -21,8 +22,28 @@
 </main>
 <div id="toast" class="message-toast"></div>
 <svg id="lineLayer" class="line-layer"></svg>
-<script src="../data/strands-puzzles.js"></script>
+<script src="../data/strands/puzzles/kitchen-tools.js"></script>
+<script src="../data/strands/puzzles/in-the-sky.js"></script>
+<script src="../data/strands/puzzles/card-games.js"></script>
+<script src="../data/strands/puzzles/ocean-life.js"></script>
+<script src="../data/strands/puzzles/types-of-music.js"></script>
+<script src="../data/strands/puzzles/baking-basics.js"></script>
+<script src="../data/strands/puzzles/woodland-animals.js"></script>
+<script src="../data/strands/puzzles/weather-words.js"></script>
+<script src="../data/strands/puzzles/board-games.js"></script>
+<script src="../data/strands/puzzles/garden-growth.js"></script>
+<script src="../data/strands/puzzles/space-exploration.js"></script>
+<script src="../data/strands/puzzles/coffee-shop.js"></script>
+<script src="../data/strands/puzzles/team-sports.js"></script>
+<script src="../data/strands/puzzles/fairy-tales.js"></script>
+<script src="../data/strands/puzzles/desert-landscape.js"></script>
 <script src="generator.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="../shared/firebase-config.js"></script>
+<script src="../shared/auth.js"></script>
+<script src="../shared/puzzle-loader.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

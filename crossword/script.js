@@ -1,4 +1,4 @@
-(function () {
+window.PuzzleData.ready("crossword").then(function () {
   const gridEl = document.getElementById("grid");
   const clueBar = document.getElementById("clueBar");
   const acrossListEl = document.getElementById("acrossList");
@@ -61,7 +61,7 @@
         input.autocomplete = "off";
         input.dataset.r = r;
         input.dataset.c = c;
-        input.addEventListener("focus", () => onFocusCell(r, c));
+        input.addEventListener("focus", () => { onFocusCell(r, c); input.select(); });
         input.addEventListener("click", () => onFocusCell(r, c, true));
         input.addEventListener("input", (e) => onInputCell(e, r, c));
         input.addEventListener("keydown", (e) => onKeyDown(e, r, c));
@@ -224,4 +224,4 @@
   });
 
   buildPuzzle();
-})();
+});

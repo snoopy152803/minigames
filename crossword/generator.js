@@ -88,8 +88,8 @@ window.CrosswordGenerator = (function () {
 
   function generate(database, opts) {
     opts = opts || {};
-    const targetCount = opts.targetCount || 10;
-    const pool = shuffle(database.filter(e => e.word.length >= 3 && e.word.length <= 9));
+    const targetCount = opts.targetCount || 12;
+    const pool = shuffle(database.filter(e => e.word.length >= 3 && e.word.length <= 14));
 
     for (let attempt = 0; attempt < 25; attempt++) {
       const grid = makeGrid();

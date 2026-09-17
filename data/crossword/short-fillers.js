@@ -1,0 +1,38 @@
+// Short connector words (3-5 letters). These mostly exist to give the longer,
+// harder words in medium.js/hard.js somewhere to intersect — the puzzle
+// itself is driven by those tougher words, not these.
+window.CROSSWORD_DATA = window.CROSSWORD_DATA || [];
+window.CROSSWORD_DATA.push(
+  { word: "ERA", clue: "Historical period" },
+  { word: "ION", clue: "Charged particle" },
+  { word: "OPT", clue: "Choose" },
+  { word: "TEN", clue: "Perfect score" },
+  { word: "NET", clue: "Catches fish, or the internet" },
+  { word: "ARC", clue: "Curved path" },
+  { word: "RAY", clue: "Beam of light" },
+  { word: "OWE", clue: "Be in debt for" },
+  { word: "ACT", clue: "Take action, or a play segment" },
+  { word: "ODE", clue: "Poem of praise" },
+  { word: "IRE", clue: "Anger" },
+  { word: "AURA", clue: "Distinctive atmosphere" },
+  { word: "IDEA", clue: "A thought" },
+  { word: "NOTE", clue: "Brief written record" },
+  { word: "RATE", clue: "Speed or cost per unit" },
+  { word: "CORE", clue: "Central part" },
+  { word: "TONE", clue: "Quality of sound" },
+  { word: "ZONE", clue: "Designated area" },
+  { word: "VOTE", clue: "Cast a ballot" },
+  { word: "LOGIC", clue: "Reasoned thinking" },
+  { word: "ORDER", clue: "Sequence, or a command" },
+  { word: "UNION", clue: "Coming together as one" },
+  { word: "MEDIA", clue: "Channels of mass communication" },
+  { word: "STATE", clue: "Condition, or a nation" },
+  { word: "TRUST", clue: "Firm belief in reliability" },
+  { word: "REACT", clue: "Respond to a stimulus" },
+  { word: "AGENT", clue: "One who acts on behalf of another" },
+  { word: "MERIT", clue: "Deserve or earn" },
+  { word: "VALUE", clue: "Worth or importance" },
+  { word: "MINOR", clue: "Less significant" },
+  { word: "MOTOR", clue: "Engine" },
+  { word: "TOTAL", clue: "Entire amount" }
+);

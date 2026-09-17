@@ -1,10 +1,9 @@
-(function () {
-  const ANSWERS = window.WORDLE_DATA.answers.map(w => w.toUpperCase());
-  const VALID = new Set([...ANSWERS, ...window.WORDLE_DATA.extraValidGuesses.map(w => w.toUpperCase())]);
+window.PuzzleData.ready("wordle").then(function () {
+  const ANSWERS = window.WORDLE_ANSWERS.map(w => w.toUpperCase());
+  const VALID = new Set([...ANSWERS, ...window.WORDLE_GUESSES.map(w => w.toUpperCase())]);
   const WORD_LEN = 5;
   const MAX_GUESSES = 6;
 
-  const EPOCH = new Date(2024, 0, 1);
   function dailyIndex() {
     const now = new Date();
     const days = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(2024, 0, 1)) / 86400000);
@@ -149,4 +148,4 @@
   document.getElementById("newPuzzleBtn").addEventListener("click", () => newGame(true));
 
   newGame(false);
-})();
+});

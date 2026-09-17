@@ -1,0 +1,32 @@
+.admin-main { max-width: 760px; align-items: stretch; }
+.admin-note {
+  background: var(--panel);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+.editor-block {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 18px;
+  margin-bottom: 20px;
+}
+.editor-block h2 { margin: 0 0 6px; font-family: var(--font-display); font-size: 19px; }
+.editor-block .hint { font-size: 13px; color: var(--ink-soft); margin: 0 0 10px; }
+.editor-block textarea {
+  width: 100%;
+  min-height: 220px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  padding: 10px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  resize: vertical;
+}
+.editor-actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+.editor-status { font-size: 13px; color: var(--ink-soft); }

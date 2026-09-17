@@ -9,7 +9,8 @@
   text-transform: uppercase;
 }
 .theme-box .theme-name {
-  font-size: 20px;
+  font-family: var(--font-display);
+  font-size: 22px;
   font-weight: 700;
   font-style: italic;
 }
@@ -25,16 +26,18 @@
   aspect-ratio: 1;
   min-width: 38px;
   border-radius: 50%;
+  background: var(--panel);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-family: var(--font-mono);
+  font-weight: 600;
   font-size: 18px;
   text-transform: uppercase;
   cursor: pointer;
   position: relative;
   z-index: 2;
-  color: var(--fg);
+  color: var(--ink);
 }
 .strands-cell.selecting { background: rgba(77, 157, 255, 0.35); }
 .strands-cell.found-theme { background: var(--present); color: #fff; }

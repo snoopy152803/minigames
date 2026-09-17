@@ -1,0 +1,43 @@
+.auth-box {
+  width: 100%;
+  max-width: 360px;
+  margin: 40px auto 0;
+  background: var(--panel);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  padding: 26px;
+  box-shadow: 4px 4px 0 var(--border);
+}
+.auth-tabs {
+  display: flex;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--border);
+}
+.auth-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 10px;
+  font-weight: 700;
+  font-family: var(--font-body);
+  color: var(--ink-soft);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+.auth-tab.active { color: var(--ink); border-bottom-color: var(--mark); }
+#authForm { display: flex; flex-direction: column; gap: 14px; }
+#authForm label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+#authForm input {
+  font-family: var(--font-body);
+  font-size: 15px;
+  padding: 10px;
+  border: 2px solid var(--border);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+}
+#authForm button.primary { margin-top: 6px; }
+.auth-msg { min-height: 20px; font-size: 13px; color: var(--mark); text-align: center; }
+.auth-note { font-size: 12px; color: var(--ink-soft); text-align: center; }
+.auth-note code { background: var(--paper); padding: 2px 5px; border-radius: 3px; }

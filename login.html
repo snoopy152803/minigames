@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Log In &middot; The Puzzle Page</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="shared/style.css">
+<link rel="stylesheet" href="shared/auth-pages.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="index.html">&larr; Hub</a>
+  <h1>Log In</h1>
+  <div></div>
+</header>
+<main>
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button id="tabLogin" class="auth-tab active">Log in</button>
+      <button id="tabSignup" class="auth-tab">Sign up</button>
+    </div>
+    <form id="authForm">
+      <label>Email
+        <input type="email" id="email" required autocomplete="email">
+      </label>
+      <label>Password
+        <input type="password" id="password" required autocomplete="current-password" minlength="6">
+      </label>
+      <button type="submit" class="primary" id="submitBtn">Log in</button>
+    </form>
+    <p id="authMsg" class="auth-msg"></p>
+    <p class="auth-note" id="notConfiguredNote" style="display:none;">
+      Firebase hasn't been configured yet &mdash; fill in <code>shared/firebase-config.js</code>
+      with your project's keys to enable accounts.
+    </p>
+  </div>
+</main>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script src="shared/firebase-config.js"></script>
+<script src="shared/auth.js"></script>
+<script>
+  let mode = "login";
+  const tabLogin = document.getElementById("tabLogin");
+  const tabSignup = document.getElementById("tabSignup");
+  const submitBtn = document.getElementById("submitBtn");
+  const authMsg = document.getElementById("authMsg");
+
+  function setMode(m) {
+    mode = m;
+    tabLogin.classList.toggle("active", m === "login");
+    tabSignup.classList.toggle("active", m === "signup");
+    submitBtn.textContent = m === "login" ? "Log in" : "Sign up";
+    authMsg.textContent = "";
+  }
+  tabLogin.addEventListener("click", () => setMode("login"));
+  tabSignup.addEventListener("click", () => setMode("signup"));
+
+  if (!window.PuzzleAuth.isConfigured()) {
+    document.getElementById("notConfiguredNote").style.display = "block";
+    submitBtn.disabled = true;
+  }
+
+  document.getElementById("authForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    authMsg.textContent = "Working...";
+    const action = mode === "login" ? window.PuzzleAuth.logIn : window.PuzzleAuth.signUp;
+    action(email, password).then(() => {
+      window.location.href = "index.html";
+    }).catch((err) => {
+      authMsg.textContent = err.message || "Something went wrong.";
+    });
+  });
+</script>
+</body>
+</html>

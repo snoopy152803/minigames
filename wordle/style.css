@@ -13,9 +13,11 @@
 .wordle-tile {
   aspect-ratio: 1;
   border: 2px solid var(--border);
+  background: var(--panel);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: var(--font-mono);
   font-size: 28px;
   font-weight: 700;
   text-transform: uppercase;

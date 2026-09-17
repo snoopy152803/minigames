@@ -1,107 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap');
+
 :root {
-  --bg: #ffffff;
-  --fg: #1a1a1b;
-  --muted: #787c7e;
-  --border: #d3d6da;
+  /* Puzzle-notebook palette: graph-paper ground, navy ink, pencil highlighter, correction-pink mark */
+  --paper: #eef1f6;
+  --paper-line: #d7deea;
+  --panel: #ffffff;
+  --ink: #1b2440;
+  --ink-soft: #545f7e;
+  --highlight: #ffc940;
+  --mark: #e23d6d;
+  --border: #ccd4e4;
+
+  /* Semantic game colors (kept close to the real games' own conventions) */
   --correct: #6aaa64;
   --present: #c9b458;
-  --absent: #787c7e;
-  --accent: #1a73e8;
-  --key-bg: #d3d6da;
+  --absent: #8a92a6;
+  --accent: #3452e1;
+  --key-bg: #dbe1ee;
+
+  /* Back-compat aliases used by the per-game stylesheets */
+  --bg: var(--paper);
+  --fg: var(--ink);
+  --muted: var(--ink-soft);
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #121213;
-    --fg: #ffffff;
-    --muted: #818384;
-    --border: #3a3a3c;
+    --paper: #121623;
+    --paper-line: #232a3d;
+    --panel: #1a2033;
+    --ink: #eef1f6;
+    --ink-soft: #a7afc7;
+    --highlight: #e0ac1f;
+    --mark: #ff5c88;
+    --border: #333c56;
     --correct: #538d4e;
     --present: #b59f3b;
-    --absent: #3a3a3c;
-    --accent: #4d9dff;
-    --key-bg: #818384;
+    --absent: #4a5170;
+    --accent: #7f9bff;
+    --key-bg: #2a3350;
   }
 }
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  font-family: "Helvetica Neue", Arial, sans-serif;
-  background: var(--bg);
-  color: var(--fg);
+  font-family: var(--font-body);
+  color: var(--ink);
   min-height: 100vh;
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 28px 28px;
 }
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+}
+
 header.topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 22px;
+  border-bottom: 2px solid var(--ink);
+  background: var(--panel);
+  flex-wrap: wrap;
+  gap: 10px;
 }
 header.topbar h1 {
-  font-size: 22px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 24px;
   margin: 0;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 header.topbar a.home-link {
-  color: var(--fg);
+  color: var(--ink-soft);
   text-decoration: none;
   font-weight: 600;
+  font-size: 14px;
 }
+header.topbar a.home-link:hover { color: var(--mark); }
+
+.auth-widget {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.auth-widget a, .auth-widget button.link-btn {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  font-family: var(--font-body);
+}
+.auth-widget a:hover, .auth-widget button.link-btn:hover { color: var(--mark); }
+
 main {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px 20px 60px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .hub-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
+  gap: 18px;
   width: 100%;
-  max-width: 900px;
+  max-width: 920px;
 }
 .game-card {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 24px;
+  position: relative;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  padding: 26px 22px;
   text-align: center;
   text-decoration: none;
-  color: var(--fg);
+  color: var(--ink);
+  background: var(--panel);
+  box-shadow: 4px 4px 0 var(--border);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 .game-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--mark);
 }
-.game-card .icon { font-size: 40px; margin-bottom: 10px; }
-.game-card h2 { margin: 6px 0; font-size: 20px; }
-.game-card p { margin: 0; color: var(--muted); font-size: 14px; }
-button.primary {
-  background: var(--fg);
-  color: var(--bg);
-  border: none;
-  border-radius: 6px;
-  padding: 10px 24px;
+.game-card .icon { font-size: 36px; margin-bottom: 8px; display: block; }
+.game-card h2 {
+  font-family: var(--font-display);
+  margin: 4px 0;
+  font-size: 22px;
   font-weight: 700;
-  font-size: 15px;
-  cursor: pointer;
+  position: relative;
+  display: inline-block;
 }
-button.primary:hover { opacity: 0.85; }
+.game-card .doodle-circle {
+  position: absolute;
+  left: -14%;
+  top: -30%;
+  width: 128%;
+  height: 170%;
+  pointer-events: none;
+  overflow: visible;
+}
+.game-card .doodle-circle path {
+  fill: none;
+  stroke: var(--mark);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 620;
+  stroke-dashoffset: 620;
+  transition: stroke-dashoffset 0.6s ease;
+}
+.game-card:hover .doodle-circle path { stroke-dashoffset: 0; }
+.game-card p { margin: 0; color: var(--ink-soft); font-size: 14px; }
+
+button.primary {
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 4px;
+  padding: 10px 22px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+button.primary:hover { background: var(--mark); }
+button.primary:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--highlight); outline-offset: 2px; }
+
 .message-toast {
   position: fixed;
-  top: 70px;
+  top: 74px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--fg);
-  color: var(--bg);
-  padding: 10px 18px;
-  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 10px 20px;
+  border-radius: 4px;
   font-weight: 700;
+  font-family: var(--font-body);
   z-index: 50;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.2s ease;
+  box-shadow: 3px 3px 0 var(--mark);
 }
 .message-toast.show { opacity: 1; }

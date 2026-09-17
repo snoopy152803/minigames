@@ -1,0 +1,38 @@
+// Medium-difficulty words (6-8 letters), mostly here to intersect with the
+// long, hard words in hard.js.
+window.CROSSWORD_DATA = window.CROSSWORD_DATA || [];
+window.CROSSWORD_DATA.push(
+  { word: "GENUINE", clue: "Authentic, not fake" },
+  { word: "NOTABLE", clue: "Worthy of attention" },
+  { word: "CULTURE", clue: "Shared customs and beliefs of a society" },
+  { word: "NATURAL", clue: "Occurring without human intervention" },
+  { word: "VISIBLE", clue: "Able to be seen" },
+  { word: "SUPREME", clue: "Highest in rank or authority" },
+  { word: "CONSENT", clue: "Permission for something to happen" },
+  { word: "EXTREME", clue: "Very great in degree" },
+  { word: "VERSION", clue: "A particular form of something" },
+  { word: "REALITY", clue: "The state of things as they actually exist" },
+  { word: "EVIDENT", clue: "Clearly seen or understood" },
+  { word: "COMPLEX", clue: "Consisting of many interconnected parts" },
+  { word: "ACCURATE", clue: "Correct in all details" },
+  { word: "ELEGANT", clue: "Gracefully stylish" },
+  { word: "INTENSE", clue: "Very strong or forceful" },
+  { word: "GENERAL", clue: "Affecting all or most people" },
+  { word: "COMMENT", clue: "A remark expressing an opinion" },
+  { word: "MEASURE", clue: "Determine the size or amount of" },
+  { word: "PRECISE", clue: "Exact and accurate" },
+  { word: "STRIVE", clue: "Make great efforts to achieve something" },
+  { word: "ADVANCE", clue: "Move forward in position or progress" },
+  { word: "RESPECT", clue: "Admiration for someone's qualities" },
+  { word: "CREATOR", clue: "One who brings something into being" },
+  { word: "MYSTERY", clue: "Something difficult to explain" },
+  { word: "TENSION", clue: "A strained state or feeling" },
+  { word: "OPINION", clue: "A personal view or judgment" },
+  { word: "VENTURE", clue: "A risky or daring undertaking" },
+  { word: "NURTURE", clue: "Care for and encourage growth" },
+  { word: "PATIENT", clue: "Able to wait calmly" },
+  { word: "MODESTY", clue: "The quality of not being boastful" },
+  { word: "HARMONY", clue: "A pleasing combination of elements" },
+  { word: "CAPTURE", clue: "Take into one's possession by force" },
+  { word: "EXAMINE", clue: "Inspect closely" }
+);
