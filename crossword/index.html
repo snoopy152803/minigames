@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini Crossword</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="../index.html">&larr; Hub</a>
+  <h1>CROSSWORD</h1>
+  <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New puzzle</button>
+</header>
+<main>
+  <div id="clueBar" class="clue-bar"></div>
+  <div id="grid" class="crossword-grid"></div>
+  <div class="cw-buttons">
+    <button id="checkBtn" class="primary">Check</button>
+    <button id="revealBtn" class="primary">Reveal</button>
+  </div>
+  <div class="clue-lists">
+    <div>
+      <h3>Across</h3>
+      <ol id="acrossList"></ol>
+    </div>
+    <div>
+      <h3>Down</h3>
+      <ol id="downList"></ol>
+    </div>
+  </div>
+</main>
+<div id="toast" class="message-toast"></div>
+<script src="../data/crossword-words.js"></script>
+<script src="generator.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+.theme-box {
+  text-align: center;
+  margin-bottom: 14px;
+}
+.theme-box .theme-label {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.theme-box .theme-name {
+  font-size: 20px;
+  font-weight: 700;
+  font-style: italic;
+}
+.strands-grid {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  user-select: none;
+  touch-action: none;
+  margin: 0 auto;
+}
+.strands-cell {
+  aspect-ratio: 1;
+  min-width: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  color: var(--fg);
+}
+.strands-cell.selecting { background: rgba(77, 157, 255, 0.35); }
+.strands-cell.found-theme { background: var(--present); color: #fff; }
+.strands-cell.found-spangram { background: var(--accent); color: #fff; }
+.line-layer {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+.strands-progress {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--muted);
+}
+.strands-progress .found-word {
+  display: inline-block;
+  margin: 3px 6px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: var(--present);
+  color: #fff;
+  font-weight: 700;
+}
+.strands-progress .found-word.spangram { background: var(--accent); }

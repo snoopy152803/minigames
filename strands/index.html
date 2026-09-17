@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Strands Clone</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="../index.html">&larr; Hub</a>
+  <h1>STRANDS</h1>
+  <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New puzzle</button>
+</header>
+<main>
+  <div id="themeBox" class="theme-box"></div>
+  <div id="grid" class="strands-grid"></div>
+  <div id="progress" class="strands-progress"></div>
+  <button id="hintBtn" class="primary" style="margin-top:14px;">Hint</button>
+</main>
+<div id="toast" class="message-toast"></div>
+<svg id="lineLayer" class="line-layer"></svg>
+<script src="../data/strands-puzzles.js"></script>
+<script src="generator.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
