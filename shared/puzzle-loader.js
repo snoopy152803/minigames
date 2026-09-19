@@ -23,6 +23,15 @@ window.PuzzleData = (function () {
     if (game === "crossword" && Array.isArray(data.clues) && data.clues.length) {
       window.CROSSWORD_DATA = data.clues;
     }
+    if (game === "connections" && Array.isArray(data.puzzles) && data.puzzles.length) {
+      window.CONNECTIONS_DATA = data.puzzles;
+    }
+    if (game === "spellingbee" && Array.isArray(data.puzzles) && data.puzzles.length) {
+      window.SPELLING_BEE_DATA = data.puzzles;
+    }
+    if (game === "pips" && Array.isArray(data.puzzles) && data.puzzles.length) {
+      window.PIPS_DATA = data.puzzles;
+    }
   }
 
   // Returns a promise that resolves once window.WORDLE_ANSWERS / STRANDS_DATA

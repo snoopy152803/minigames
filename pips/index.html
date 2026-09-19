@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pips</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="../shared/favicon.svg">
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="../index.html">&larr; Hub</a>
+  <h1>PIPS</h1>
+  <div id="authWidget" class="auth-widget"></div>
+  <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New puzzle</button>
+</header>
+<main>
+  <p class="pips-instructions">Fill every domino outline on the board using the dominoes below, so each colored region satisfies its label.<br>
+    A number label means the pips in that region must add up to it. An <code>=</code> label means every filled cell in that region must show the same number.</p>
+  <div id="board" class="pips-board"></div>
+  <div class="pips-buttons">
+    <button id="checkBtn" class="primary">Check</button>
+    <button id="clearBtn" class="primary">Clear board</button>
+  </div>
+  <div id="tray" class="pips-tray"></div>
+</main>
+<div id="toast" class="message-toast"></div>
+<script src="generator.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>Puzzle Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="shared/favicon.svg">
 <link rel="stylesheet" href="shared/style.css">
 <link rel="stylesheet" href="shared/admin.css">
 </head>
@@ -18,7 +19,9 @@
 
   <div id="editors" style="display:none; width:100%;">
     <p class="admin-note">
-      Edits here change the puzzle for <em>everyone</em>, stylesheets in GitHub shared/admin.css or shared/style.css. 
+      Editing here changes the puzzle for <strong>everyone</strong>, starting the next time each
+      person loads a page fresh &mdash; anyone already mid-puzzle today keeps the version they
+      started with.
     </p>
 
     <!-- WORDLE -->
@@ -61,8 +64,38 @@
         <span class="editor-status" id="crosswordStatus"></span>
       </div>
     </section>
+    <!-- CONNECTIONS -->
+    <section class="editor-block">
+      <h2>Connections &mdash; puzzles</h2>
+      <p class="hint">Each puzzle needs exactly 4 groups of 4 words, easiest (yellow) to hardest (purple). One group per line, formatted as <code>Category name: WORD, WORD, WORD, WORD</code>. All 16 words in a puzzle must be different from each other.</p>
+      <div id="connectionsCards"></div>
+      <button class="secondary" id="addConnectionsPuzzle" type="button">+ Add puzzle</button>
+      <div class="editor-actions">
+        <button class="primary" data-game="connections" data-action="load">Load current</button>
+        <button class="primary" data-game="connections" data-action="save">Save for everyone</button>
+        <span class="editor-status" id="connectionsStatus"></span>
+      </div>
+    </section>
+
+    <!-- SPELLING BEE -->
+    <section class="editor-block">
+      <h2>Spelling Bee &mdash; letter sets</h2>
+      <p class="hint">One real word per line, using exactly 7 different letters (repeats within the word are fine, e.g. "MONTHLY"). The game automatically works out every valid word and picks the best center letter from the built-in dictionary &mdash; you don't need to list words yourself. Note: "Load current" shows each puzzle's 7 letters, not necessarily the original word you typed &mdash; that's fine, just replace a line with any other real word to change that puzzle.</p>
+      <textarea id="beeWords" class="word-list" spellcheck="false" placeholder="CAPTURE&#10;PICTURE&#10;KITCHEN"></textarea>
+      <div class="editor-actions">
+        <button class="primary" data-game="spellingbee" data-action="load">Load current</button>
+        <button class="primary" data-game="spellingbee" data-action="save">Save for everyone</button>
+        <span class="editor-status" id="spellingbeeStatus"></span>
+      </div>
+    </section>
   </div>
 </main>
+<script src="data/spelling-bee/dictionary/dict-1-A-D.js"></script>
+<script src="data/spelling-bee/dictionary/dict-2-E-I.js"></script>
+<script src="data/spelling-bee/dictionary/dict-3-J-N.js"></script>
+<script src="data/spelling-bee/dictionary/dict-4-O-R.js"></script>
+<script src="data/spelling-bee/dictionary/dict-5-S-U.js"></script>
+<script src="data/spelling-bee/dictionary/dict-6-V-Z.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
@@ -71,8 +104,8 @@
 <script>
   const gate = document.getElementById("gate");
   const editors = document.getElementById("editors");
-  const FIELD = { wordle: "answers", strands: "puzzles", crossword: "clues" };
-  const STATUS_ID = { wordle: "wordleStatus", strands: "strandsStatus", crossword: "crosswordStatus" };
+  const FIELD = { wordle: "answers", strands: "puzzles", crossword: "clues", connections: "puzzles", spellingbee: "puzzles" };
+  const STATUS_ID = { wordle: "wordleStatus", strands: "strandsStatus", crossword: "crosswordStatus", connections: "connectionsStatus", spellingbee: "spellingbeeStatus" };
 
   function setStatus(game, text, isError) {
     const el = document.getElementById(STATUS_ID[game]);
@@ -164,8 +197,80 @@
     (entries && entries.length ? entries : [null]).forEach(addCrosswordRow);
   }
 
-  const GETTERS = { wordle: getWordleValue, strands: getStrandsValue, crossword: getCrosswordValue };
-  const SETTERS = { wordle: setWordleValue, strands: setStrandsValue, crossword: setCrosswordValue };
+  // ---------- Connections: repeatable puzzle cards, 4 groups per card ----------
+  const CONN_COLORS = ["yellow", "green", "blue", "purple"];
+  const connectionsCards = document.getElementById("connectionsCards");
+  function addConnectionsCard(puzzle) {
+    const groups = (puzzle && puzzle.groups) || CONN_COLORS.map(() => ({ category: "", words: [] }));
+    const card = document.createElement("div");
+    card.className = "repeat-card";
+    card.innerHTML =
+      '<button class="remove-btn" type="button" title="Remove this puzzle">&times;</button>' +
+      CONN_COLORS.map((color, i) => {
+        const g = groups[i] || { category: "", words: [] };
+        const line = g.category ? g.category + ": " + g.words.join(", ") : "";
+        return '<label>' + color[0].toUpperCase() + color.slice(1) + ' group (easiest first)' +
+          '<input type="text" class="conn-group-input" data-color="' + color + '" value="' + line.replace(/"/g, "&quot;") + '" placeholder="Category name: WORD, WORD, WORD, WORD"></label>';
+      }).join("");
+    card.querySelector(".remove-btn").addEventListener("click", () => card.remove());
+    connectionsCards.appendChild(card);
+  }
+  document.getElementById("addConnectionsPuzzle").addEventListener("click", () => addConnectionsCard());
+
+  function getConnectionsValue() {
+    const cards = [...connectionsCards.querySelectorAll(".repeat-card")];
+    if (!cards.length) throw new Error("Add at least one puzzle");
+    return cards.map((card, i) => {
+      const inputs = [...card.querySelectorAll(".conn-group-input")];
+      const groups = inputs.map(input => {
+        const color = input.dataset.color;
+        const val = input.value.trim();
+        const colonIdx = val.indexOf(":");
+        if (colonIdx === -1) throw new Error("Puzzle #" + (i + 1) + "'s " + color + " group needs a \"Category: WORD, WORD, WORD, WORD\" format");
+        const category = val.slice(0, colonIdx).trim();
+        const words = val.slice(colonIdx + 1).split(",").map(w => w.trim().toUpperCase()).filter(Boolean);
+        if (!category) throw new Error("Puzzle #" + (i + 1) + "'s " + color + " group needs a category name");
+        if (words.length !== 4) throw new Error("Puzzle #" + (i + 1) + "'s " + color + " group needs exactly 4 words (has " + words.length + ")");
+        return { category, color, words };
+      });
+      const allWords = groups.flatMap(g => g.words);
+      if (new Set(allWords).size !== 16) throw new Error("Puzzle #" + (i + 1) + " has a word repeated across groups — all 16 words must be different");
+      return { groups };
+    });
+  }
+  function setConnectionsValue(puzzles) {
+    connectionsCards.innerHTML = "";
+    (puzzles && puzzles.length ? puzzles : [null]).forEach(addConnectionsCard);
+  }
+
+  // ---------- Spelling Bee: one real pangram word per line ----------
+  function getBeeValue() {
+    const dict = new Set(window.SPELLING_BEE_DICTIONARY || []);
+    const lines = document.getElementById("beeWords").value.split(/[\n,]+/).map(w => w.trim().toUpperCase()).filter(Boolean);
+    if (!lines.length) throw new Error("Add at least one word");
+    return lines.map(word => {
+      const letters = [...new Set(word.split(""))];
+      if (letters.length !== 7) throw new Error(word + " needs exactly 7 different letters (has " + letters.length + ")");
+      const letterSet = new Set(letters);
+      const usable = [...dict].filter(w => w.length >= 4 && [...w].every(ch => letterSet.has(ch)));
+      const pangramExists = usable.some(w => letters.every(l => w.includes(l)));
+      if (!pangramExists) throw new Error(word + "'s letters don't form a valid pangram in the dictionary — try a different word");
+      let bestCenter = letters[0], bestCount = -1;
+      for (const l of letters) {
+        const count = usable.filter(w => w.includes(l)).length;
+        if (count > bestCount) { bestCount = count; bestCenter = l; }
+      }
+      return { center: bestCenter, outerLetters: letters.filter(l => l !== bestCenter) };
+    });
+  }
+  function setBeeValue(puzzles) {
+    document.getElementById("beeWords").value = (puzzles || [])
+      .map(p => p.center + (p.outerLetters || []).join(""))
+      .join("\n");
+  }
+
+  const GETTERS = { wordle: getWordleValue, strands: getStrandsValue, crossword: getCrosswordValue, connections: getConnectionsValue, spellingbee: getBeeValue };
+  const SETTERS = { wordle: setWordleValue, strands: setStrandsValue, crossword: setCrosswordValue, connections: setConnectionsValue, spellingbee: setBeeValue };
 
   async function loadGame(game) {
     setStatus(game, "Loading...");
@@ -208,6 +313,7 @@
   // Start each section with one blank card/row so the page isn't empty.
   addStrandsCard();
   addCrosswordRow();
+  addConnectionsCard();
 
   function showGate(message) {
     gate.style.display = "block";

@@ -51,4 +51,6 @@ window.FIREBASE_CONFIG = {
 // convenience for hiding the UI — the *real* enforcement has to happen in
 // your Realtime Database security rules (see comments above), since anyone
 // can read this file.
-window.ADMIN_EMAILS = ["yawensha16@gmail.com"];
+window.ADMIN_EMAILS = [
+  // "you@example.com"
+];

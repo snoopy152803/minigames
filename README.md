@@ -1,116 +1,165 @@
-# NYTimes Games Clone — Puzzle Hub
+# Doggy Mini Games
 
-### *Website live now on doggyminigames.vercel.app*
+A small NYT Games-style site: six daily word/logic puzzles (Wordle, Strands,
+Crossword, Connections, Spelling Bee, Pips) that run entirely as static
+HTML/CSS/JS, with puzzle content stored in small, easy-to-edit data files.
+Optionally, sign in with Firebase and use `admin.html` to change the puzzles
+for every visitor without redeploying.
 
-A modular, lightweight **New York Times Games ecosystem** clone built to serve multiple interactive word games off a shared client-side architecture. It includes user account workflows, a real-time admin management portal, and full-featured game variants.
+Live at: **doggyminigames.vercel.app**
 
----
+## How it works
 
-## 📂 System Architecture & Workspace Topology
+There's no build step and no server-side code. Every game is a folder with
+its own `index.html` + `style.css` + `script.js`, plus (for the auto-generated
+ones) a `generator.js`. Puzzle *content* — words, clues, themes — lives
+separately under `data/`, split into small files so you can open and edit
+just the piece you care about instead of one giant file.
 
-The codebase relies on strict path-resolution helper modules (`rootPath()`) to seamlessly bridge single-page interfaces across flat root levels and deep game directories:
+| Game | Folder | How it's generated |
+|---|---|---|
+| Wordle | `wordle/` | Picks a word from a curated answer list; a much larger dictionary decides which guesses are "valid" |
+| Strands | `strands/` | A theme + word list is auto-placed onto a letter grid as snaking paths |
+| Crossword | `crossword/` | A word/clue database is auto-placed onto a grid via letter intersections |
+| Connections | `connections/` | Fixed groups of 4×4 words, shuffled into a grid each time |
+| Spelling Bee | `spellingbee/` | You give it 7 letters; it computes every valid word from a bundled dictionary itself |
+| Pips | `pips/` | Fully generated on the fly every time — a random domino tiling plus region constraints, no stored puzzle data at all |
 
-```text
-├── shared/
-│   ├── firebase-config.js      # Production Database connection string & API arrays
-│   ├── main.css                # Notebook theme rules & design configurations
-│   ├── auth.css                # Interface layouts for credential entries
-│   ├── admin.css               # Flex grid alignments for manager components
-│   ├── masthead.css            # Static print headers for hub identity layout
-│   ├── puzzle-auth.js          # Compat wrapper for multi-tier privilege checks
-│   └── puzzle-data.js          # Local cache middleware mapping dynamic overrides
-├── data/
-│   ├── wordle/
-│   │   ├── answers/            # Curated puzzle target index array (A-Z)
-│   │   └── guesses/            # Accepted guess lookup library dictionary (A-Z)
-│   ├── strands/
-│   │   └── puzzles/            # Native JSON theme objects library (15 curated categories)
-│   └── crossword/
-│       └── database/           # Crossword tiered clue matrix array configurations
-├── Wordle/
-│   ├── index.html              # Wordle markup interface
-│   ├── app.js                  # Stateful row processing & selection matrix
-│   └── style.css               # Keyboard typography & CSS transform rules
-├── Strands/
-│   ├── generator.js            # Self-avoiding path generator & grid populator
-│   ├── main.js                 # 8-directional vector drawing & selection logic
-│   └── style.css               # Absolute overlay layer & circle grid canvas
-└── Crossword/
-    ├── index.html              # Crossword layout and control structure
-    ├── generator.js            # Algorithmic canvas layout generator & box trimmer
-    ├── main.js                 # Grid mapping focus tracking, navigation and checking handlers
-    └── style.css               # Absolute numeric markers & cell selection masks
+### Data layout
+
+```
+data/
+  wordle/
+    answers/        curated answer pool, split A-F / G-M / N-S / T-Z
+    guesses/         big accepted-guess dictionary, split into 5 files
+  strands/puzzles/   one file per theme (kitchen-tools.js, ocean-life.js, ...)
+  crossword/         short-fillers.js / medium.js / hard.js clue databases
+  connections/puzzles/  one file per puzzle
+  spelling-bee/
+    dictionary/      the word-validity dictionary, split into 6 files
+    puzzles/         one file per letter-set (just {center, outerLetters})
 ```
 
----
+Every data file is a plain `.js` file that pushes onto a `window.SOMETHING`
+array — e.g. `window.STRANDS_DATA.push({...})`. That's so pages can be
+opened directly (`file://...`) or from any static host without a build step;
+there's nothing to compile. Open any file under `data/` to see the shape and
+copy it when adding more content by hand.
 
-## ⚙️ Core Engines & Technical Workflows
+## Running it locally
 
-### 1. Wordle Engine & Dictionary Matrix
-*   **Segmented Data Separation**: Divides string data into two clear categories under `data/wordle/` to optimize footprint performance:
-    *   `window.WORDLE_ANSWERS`: A selective, curated list of standard 5-letter solution targets.
-    *   `window.WORDLE_GUESSES`: An exhaustive reference list used to validate all incoming guesses.
-*   **Deterministic Daily Selection**: Uses an epoch-stepping baseline calculation (`Date.UTC(2024, 0, 1)`) to walk cleanly through target keys based on the calendar day. This ensures all users receive the exact same puzzle daily sequence without relying on server-side timers.
+Since it's static files, any local web server works. From this folder:
 
-### 2. Strands Layout Generator
-*   **Algorithmic Routing Matrix**: Automatically builds boards by taking a themed phrase list and threading each word through adjacent grid paths using an 8-directional layout system.
-*   **Self-Avoiding Pathing**: Implements a shuffling technique (`tryPlaceWord`) that checks available steps against an occupancy map to keep paths from colliding, before filling the rest of the board with random letter padding.
-
-### 3. Crossword Core Engine
-The `Crossword/` engine drives an adaptive, intersection-based placement sequence that dynamically creates grid puzzles from raw data matrices:
-
-```text
-       [M] O N U [M] E N T A L        <- Engine seats the longest word first
-                 [E]
-                 [A]
-     [G] E N U I [N] E                 <- Injects medium/short links intersecting axes
-     [E]         [E]
-   [O] P T       [W] O R T H          <- Bounding box shrinks to remove margins
+```bash
+python -m http.server 8000
 ```
 
-#### A. Layout Computation Architecture (`generator.js`)
-*   **Canvas Placement Mapping**: Initializes a `21x21` virtual canvas and automatically places the longest phrase directly across the horizontal center line (`CENTER`) as the primary anchor block.
-*   **Collision Avoidance Protocols**: Cycles up to 25 times per generation request using `canPlace()`. It scans adjacent grid coordinates to block structural placement if an entry creates unintended side-by-side matches.
-*   **Dynamic Trimming & Box Bounds**: Trims away all dead margins on the master canvas using `finalize()`, recalculating a compact, focused boundary grid box around the active entries.
+Then open `http://localhost:8000/`. (Opening `index.html` directly by
+double-clicking also mostly works, but a couple of things — service-worker-
+style caching quirks aside — behave more predictably over `http://`.)
 
-#### B. Cell Interface & Navigation Rules (`main.js`)
-*   **Cell State Matrix Mapping**: Links input elements back to database entries via a structural map tracker (`cellWordMap[r][c]`), allowing the interface to highlight perpendicular tracks instantly when users click a slot.
-*   **Direction Toggling**: Changes direction automatically (`across` ⇋ `down`) if a user clicks an active crossing intersection cell twice.
+## Deploying
 
----
+It's a plain static site, so pushing this folder to Vercel (or Netlify,
+GitHub Pages, etc.) with no build command and no output directory override
+is enough.
 
-## 🎨 Global Design Tokens (`main.css`)
+## Changing the site icon / favicon
 
-The application adopts a responsive **notebook/graph-paper aesthetic** leveraging a structured layout grid system:
+The icon shown in browser tabs is [`shared/favicon.svg`](shared/favicon.svg)
+— currently a paw print. To change it:
 
-| Token Name | Light Mode Value | Dark Mode Value | Operational Meaning |
-| :--- | :--- | :--- | :--- |
-| `--paper` | `#eef1f6` | `#121623` | Primary workspace background |
-| `--paper-line` | `#d7deea` | `#232a3d` | Grid alignment notebook lines |
-| `--ink` | `#1b2440` | `#eef1f6` | Core structural typography ink |
-| `--correct` | `#6aaa64` | `#538d4e` | Valid positional target hit |
-| `--present` | `#c9b458` | `#b59f3b` | Displaced keyword match state |
-| `--absent` | `#8a92a6` | `#4a5170` | Extraneous dictionary guess element |
-| `--accent` | `#3452e1` | `#7f9bff` | Highlight anchor tags (e.g. Spangram found) |
-| `--mark` | `#e23d6d` | `#ff5c88` | Errors, deletions, and warning states |
+1. Replace the contents of `shared/favicon.svg` with your own SVG (any
+   editor, or export one from a tool like Figma/Illustrator/an icon
+   generator). Keep the `viewBox="0 0 64 64"` sizing convention if you want
+   it to line up the same way, but it's not required.
+2. That's it — every page links to this one file
+   (`<link rel="icon" type="image/svg+xml" href=".../shared/favicon.svg">`),
+   so there's nothing else to update.
 
----
+If you'd rather use a PNG/ICO instead of SVG, add the file (e.g.
+`shared/favicon.png`) and change every `<link rel="icon" ...>` tag's `href`
+and `type` to match — there's one such tag near the top of each page's
+`<head>` (search the project for `favicon` to find them all).
 
-## 🔒 Security & Firebase Provisioning
+## Firebase: accounts + shared puzzle editing (optional)
 
-### Realtime Database Security Rules
-To allow anyone to load the daily puzzle configurations while locking backend write permissions exclusively to the deployment head administrator, the database uses these explicit **Firebase Console rules**:
+None of the games *require* Firebase — without it, everyone just plays the
+puzzles bundled in `data/`. Firebase adds two optional things: login/signup,
+and a live admin page (`admin.html`) that lets a signed-in admin change the
+puzzles for every visitor.
 
-```json
-{
-  "rules": {
-    "puzzles": {
-      ".read": true,
-      ".write": "auth != null && auth.token.email === 'yawensha16@gmail.com'"
-    }
-  }
-}
-```
+Realtime Database was chosen over Firestore here because it's simpler for
+this use case (one small JSON tree of puzzle data); if you created a
+Firestore database instead at some point, the code would need switching back
+— it currently expects Realtime Database.
 
-### Key Management Notice
-> ⚠️ **Critical Production Requirement**: The backend API verification keys are kept strict and private. Never commit a raw config configuration object containing unmasked Firebase details directly into a public GitHub repository branch. Local development should maintain keys hidden via git-ignored environmental files or securely injected script variables.
+### Setup
+
+1. Create a project at [console.firebase.google.com](https://console.firebase.google.com).
+2. Project settings → General → add a **Web app**; copy the config object.
+3. Authentication → Sign-in method → enable **Email/Password**.
+4. Realtime Database → create a database; copy its URL (shown at the top of
+   that page) into `databaseURL`.
+5. Paste everything into [`shared/firebase-config.js`](shared/firebase-config.js)
+   — it has inline comments showing exactly which console page each value
+   comes from.
+6. Set your Realtime Database security rules (Realtime Database → Rules) so
+   only you can write, while anyone can read:
+   ```json
+   {
+     "rules": {
+       "puzzles": {
+         ".read": true,
+         ".write": "auth != null && auth.token.email === 'you@example.com'"
+       }
+     }
+   }
+   ```
+7. Add your email to `window.ADMIN_EMAILS` in `shared/firebase-config.js`
+   (this only hides the admin UI from non-admins — the rule above is what
+   actually enforces it).
+8. Sign up for an account at `login.html`, then open `admin.html`.
+
+### Using the admin page
+
+Each game gets a form (not raw JSON) — a text box for Wordle's word list,
+repeatable cards for Strands/Connections puzzles, repeatable rows for the
+crossword clue database, one word per line for Spelling Bee. Hit **Load
+current** to see what's live, edit it, and **Save for everyone**.
+
+Changes take effect the next time someone loads the page fresh. If someone's
+already mid-puzzle, they keep the version they started with for the rest of
+that day — a browser only re-checks for a new puzzle once every 24 hours, so
+nobody gets the rug pulled out from under them mid-solve.
+
+Pips isn't in the admin page: it has no stored puzzle at all, it's generated
+from scratch every time you open it.
+
+## Adding more puzzle content
+
+- **Wordle**: add words to any file in `data/wordle/answers/` (5-letter
+  words only) — or just use `admin.html` once Firebase is set up.
+- **Strands**: add a new file to `data/strands/puzzles/` following the
+  existing ones' shape, then add a `<script src="...">` line for it in
+  `strands/index.html`.
+- **Crossword**: add `{word, clue}` entries to any file in `data/crossword/`.
+- **Connections**: add a file to `data/connections/puzzles/` (4 groups of 4
+  words each) and reference it in `connections/index.html`.
+- **Spelling Bee**: add a file to `data/spelling-bee/puzzles/` — easiest way
+  is via `admin.html`, since it needs the dictionary to pick a good center
+  letter automatically.
+
+## Known limitations
+
+- The crossword generator places words by intersection only (no full-grid
+  fill), so grids have more black squares than an authentic NYT Mini.
+- Strands' auto-placed grids use filler letters in unused cells (not a fully
+  packed board like the real game).
+- Pips uses a "loose" reading of the classic 28-domino set (no attempt to
+  avoid picking the same domino twice across different games) and only
+  generates 4×4 boards.
+- The Spelling Bee and Wordle dictionaries are general-purpose English word
+  lists (ENABLE1 and a public Wordle word list, respectively) rather than
+  NYT's own curated lists, so you'll occasionally see an obscure word
+  accepted, or fail to find a common one that NYT would allow.

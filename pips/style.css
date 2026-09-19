@@ -1,0 +1,73 @@
+.pips-instructions { text-align: center; color: var(--ink-soft); font-size: 13px; max-width: 420px; margin: 0 auto 16px; line-height: 1.5; }
+.pips-instructions code { background: var(--panel); padding: 1px 5px; border-radius: 3px; }
+
+.pips-board {
+  display: grid;
+  gap: 3px;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  background: var(--ink);
+  padding: 3px;
+  border-radius: 8px;
+}
+.pips-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+.pips-cell .badge {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(27,36,64,0.65);
+}
+.pips-cell.wall-top { border-top-color: var(--ink); }
+.pips-cell.wall-bottom { border-bottom-color: var(--ink); }
+.pips-cell.wall-left { border-left-color: var(--ink); }
+.pips-cell.wall-right { border-right-color: var(--ink); }
+.pips-cell.filled { font-weight: 800; }
+
+.pips-buttons { display: flex; justify-content: center; gap: 10px; margin: 16px 0; flex-wrap: wrap; }
+.pips-buttons button.primary { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
+.pips-buttons button.primary:hover { background: var(--ink); color: var(--paper); }
+
+.pips-tray {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.pips-domino {
+  display: flex;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--panel);
+}
+.pips-domino.selected { outline: 3px solid var(--mark); }
+.pips-domino .half {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 16px;
+  border-right: 1px solid var(--border);
+}
+.pips-domino .half:last-child { border-right: none; }

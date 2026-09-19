@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Spelling Bee</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="../shared/favicon.svg">
+<link rel="stylesheet" href="../shared/style.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="../index.html">&larr; Hub</a>
+  <h1>SPELLING BEE</h1>
+  <div id="authWidget" class="auth-widget"></div>
+  <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New puzzle</button>
+</header>
+<main>
+  <div class="bee-top">
+    <div class="bee-rank" id="rankLabel">Beginner</div>
+    <div class="bee-progress"><div class="bee-progress-fill" id="progressFill"></div></div>
+    <div class="bee-score" id="scoreLabel">0 pts</div>
+  </div>
+  <div class="bee-current" id="currentWord">&nbsp;</div>
+  <div id="hive" class="bee-hive"></div>
+  <div class="bee-buttons">
+    <button id="deleteBtn" class="primary">Delete</button>
+    <button id="shuffleBtn" class="primary">Shuffle</button>
+    <button id="enterBtn" class="primary">Enter</button>
+  </div>
+  <button id="toggleFound" class="secondary" type="button" style="margin-top:20px;">Found words (<span id="foundCount">0</span>)</button>
+  <div id="foundList" class="bee-found" style="display:none;"></div>
+</main>
+<div id="toast" class="message-toast"></div>
+<script src="../data/spelling-bee/dictionary/dict-1-A-D.js"></script>
+<script src="../data/spelling-bee/dictionary/dict-2-E-I.js"></script>
+<script src="../data/spelling-bee/dictionary/dict-3-J-N.js"></script>
+<script src="../data/spelling-bee/dictionary/dict-4-O-R.js"></script>
+<script src="../data/spelling-bee/dictionary/dict-5-S-U.js"></script>
+<script src="../data/spelling-bee/dictionary/dict-6-V-Z.js"></script>
+<script src="../data/spelling-bee/puzzles/capture.js"></script>
+<script src="../data/spelling-bee/puzzles/picture.js"></script>
+<script src="../data/spelling-bee/puzzles/monthly.js"></script>
+<script src="../data/spelling-bee/puzzles/compute.js"></script>
+<script src="../data/spelling-bee/puzzles/plastic.js"></script>
+<script src="../data/spelling-bee/puzzles/blanket.js"></script>
+<script src="../data/spelling-bee/puzzles/numeric.js"></script>
+<script src="../data/spelling-bee/puzzles/modesty.js"></script>
+<script src="../data/spelling-bee/puzzles/formula.js"></script>
+<script src="../data/spelling-bee/puzzles/journal.js"></script>
+<script src="../data/spelling-bee/puzzles/network.js"></script>
+<script src="../data/spelling-bee/puzzles/kitchen.js"></script>
+<script src="../data/spelling-bee/puzzles/dynamic.js"></script>
+<script src="../data/spelling-bee/puzzles/custody.js"></script>
+<script src="../data/spelling-bee/puzzles/machine.js"></script>
+<script src="../data/spelling-bee/puzzles/gravity.js"></script>
+<script src="../data/spelling-bee/puzzles/workmen.js"></script>
+<script src="../data/spelling-bee/puzzles/lawyers.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="../shared/firebase-config.js"></script>
+<script src="../shared/auth.js"></script>
+<script src="../shared/puzzle-loader.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
