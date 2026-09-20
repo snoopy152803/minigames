@@ -32,19 +32,38 @@ data/
   wordle/
     answers/        curated answer pool, split A-F / G-M / N-S / T-Z
     guesses/         big accepted-guess dictionary, split into 5 files
-  strands/puzzles/   one file per theme (kitchen-tools.js, ocean-life.js, ...)
+  strands/puzzles.js     every theme, one array
   crossword/         short-fillers.js / medium.js / hard.js clue databases
-  connections/puzzles/  one file per puzzle
+  connections/puzzles.js  every puzzle, one array
   spelling-bee/
     dictionary/      the word-validity dictionary, split into 6 files
-    puzzles/         one file per letter-set (just {center, outerLetters})
+    puzzles.js       every letter-set, one array (just {center, outerLetters})
 ```
+
+(Wordle's answers/guesses and the Spelling Bee dictionary stay split into
+several files each because they're genuinely large word lists; Strands,
+Connections, and Spelling Bee's puzzle lists used to be one file per puzzle,
+which was nicer for editing a single puzzle but pushed the repo over
+GitHub's 100-file web-upload limit, so they're back to one file per game.)
 
 Every data file is a plain `.js` file that pushes onto a `window.SOMETHING`
 array — e.g. `window.STRANDS_DATA.push({...})`. That's so pages can be
 opened directly (`file://...`) or from any static host without a build step;
 there's nothing to compile. Open any file under `data/` to see the shape and
 copy it when adding more content by hand.
+
+Every `<script src>` / `<link href>` in the project is **root-relative**
+(starts with `/`, e.g. `/shared/style.css`), not relative to the current
+folder. This matters because visiting a clean URL like
+`doggyminigames.vercel.app/pips` (no trailing slash) serves `pips/index.html`
+at a URL that *looks* like it's at the site root — a plain relative path
+like `style.css` would then 404, because the browser resolves it against
+`/` instead of `/pips/`, and the whole page renders blank with no visible
+error apart from 404s in the console. Root-relative paths sidestep that
+entirely. If you add a new page or asset, keep using a leading `/` on every
+local `src`/`href` rather than a relative path. (`vercel.json` also sets
+`trailingSlash: true` as a second safety net, but the root-relative paths
+are what actually make this robust regardless of host.)
 
 ## Running it locally
 
@@ -140,15 +159,15 @@ from scratch every time you open it.
 
 - **Wordle**: add words to any file in `data/wordle/answers/` (5-letter
   words only) — or just use `admin.html` once Firebase is set up.
-- **Strands**: add a new file to `data/strands/puzzles/` following the
-  existing ones' shape, then add a `<script src="...">` line for it in
-  `strands/index.html`.
+- **Strands**: add another `{theme, spangram, words}` object to the array in
+  `data/strands/puzzles.js` — or just use `admin.html`.
 - **Crossword**: add `{word, clue}` entries to any file in `data/crossword/`.
-- **Connections**: add a file to `data/connections/puzzles/` (4 groups of 4
-  words each) and reference it in `connections/index.html`.
-- **Spelling Bee**: add a file to `data/spelling-bee/puzzles/` — easiest way
-  is via `admin.html`, since it needs the dictionary to pick a good center
-  letter automatically.
+- **Connections**: add another `{groups}` object to the array in
+  `data/connections/puzzles.js` (4 groups of 4 words each) — or use `admin.html`.
+- **Spelling Bee**: add a line to the box in `admin.html` — easiest way,
+  since it needs the dictionary to pick a good center letter automatically.
+  (You can also hand-edit `data/spelling-bee/puzzles.js` directly, but
+  you'd need to work out the best center letter yourself.)
 
 ## Known limitations
 

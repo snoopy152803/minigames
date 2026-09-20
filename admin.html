@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <title>Puzzle Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="icon" type="image/svg+xml" href="shared/favicon.svg">
-<link rel="stylesheet" href="shared/style.css">
-<link rel="stylesheet" href="shared/admin.css">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/style.css">
+<link rel="stylesheet" href="/shared/admin.css">
 </head>
 <body>
 <header class="topbar">
-  <a class="home-link" href="index.html">&larr; Hub</a>
+  <a class="home-link" href="/index.html">&larr; Hub</a>
   <h1>Puzzle Admin</h1>
   <div id="authWidget" class="auth-widget"></div>
 </header>
@@ -90,17 +90,17 @@
     </section>
   </div>
 </main>
-<script src="data/spelling-bee/dictionary/dict-1-A-D.js"></script>
-<script src="data/spelling-bee/dictionary/dict-2-E-I.js"></script>
-<script src="data/spelling-bee/dictionary/dict-3-J-N.js"></script>
-<script src="data/spelling-bee/dictionary/dict-4-O-R.js"></script>
-<script src="data/spelling-bee/dictionary/dict-5-S-U.js"></script>
-<script src="data/spelling-bee/dictionary/dict-6-V-Z.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-1-A-D.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-2-E-I.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-3-J-N.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-4-O-R.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-5-S-U.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-6-V-Z.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
-<script src="shared/firebase-config.js"></script>
-<script src="shared/auth.js"></script>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
 <script>
   const gate = document.getElementById("gate");
   const editors = document.getElementById("editors");
@@ -327,7 +327,7 @@
     window.PuzzleAuth.onChange((user) => {
       if (!user) {
         showGate("You need to log in to use the admin page.");
-        gate.innerHTML = 'You need to <a href="login.html">log in</a> to use the admin page.';
+        gate.innerHTML = 'You need to <a href="/login.html">log in</a> to use the admin page.';
       } else if (!window.PuzzleAuth.isAdmin(user)) {
         showGate("Logged in as " + user.email + ", but that address isn't in shared/firebase-config.js's ADMIN_EMAILS list, so this page won't let you save changes.");
       } else {
