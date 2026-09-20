@@ -2,34 +2,25 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Wordle Clone</title>
+<title>Today's Wordle Answer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
 <link rel="stylesheet" href="/shared/style.css">
-<link rel="stylesheet" href="/wordle/style.css">
+<link rel="stylesheet" href="/shared/answers.css">
 </head>
 <body>
 <header class="topbar">
-  <a class="home-link" href="/index.html">&larr; Hub</a>
-  <h1>WORDLE</h1>
+  <a class="home-link" href="/wordle/index.html">&larr; Wordle</a>
+  <h1>TODAY'S ANSWER</h1>
   <div id="authWidget" class="auth-widget"></div>
-  <a class="home-link" href="/wordle/answers/">Answers</a>
-  <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New word</button>
 </header>
-<main>
-  <div id="board" class="wordle-board"></div>
-  <div id="keyboard" class="keyboard"></div>
+<main class="answers-main">
+  <div id="answersRoot"></div>
 </main>
-<div id="toast" class="message-toast"></div>
 <script src="/data/wordle/answers/answers-1-A-F.js"></script>
 <script src="/data/wordle/answers/answers-2-G-M.js"></script>
 <script src="/data/wordle/answers/answers-3-N-S.js"></script>
 <script src="/data/wordle/answers/answers-4-T-Z.js"></script>
-<script src="/data/wordle/guesses/guesses-1-A-D.js"></script>
-<script src="/data/wordle/guesses/guesses-2-E-I.js"></script>
-<script src="/data/wordle/guesses/guesses-3-J-O.js"></script>
-<script src="/data/wordle/guesses/guesses-4-P-S.js"></script>
-<script src="/data/wordle/guesses/guesses-5-T-Z.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
@@ -37,6 +28,21 @@
 <script src="/shared/auth.js"></script>
 <script src="/shared/puzzle-loader.js"></script>
 <script src="/shared/daily.js"></script>
-<script src="/wordle/script.js"></script>
+<script src="/shared/answers.js"></script>
+<script>
+  window.PuzzleData.ready("wordle").then(function () {
+    window.AnswersPage.render({
+      game: "wordle",
+      gameName: "Wordle",
+      playHref: "/wordle/index.html",
+      archiveHref: "/wordle/answers/",
+      onlyToday: true,
+      getAnswerForDay: function (day) {
+        const idx = window.DailyPuzzle.indexForDay(day, window.WORDLE_ANSWERS.length);
+        return '<span class="mono-answer">' + window.WORDLE_ANSWERS[idx] + '</span>';
+      }
+    });
+  });
+</script>
 </body>
 </html>

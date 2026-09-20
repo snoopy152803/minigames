@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Today's Spelling Bee Answer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/style.css">
+<link rel="stylesheet" href="/shared/answers.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="/spellingbee/index.html">&larr; Spelling Bee</a>
+  <h1>TODAY'S ANSWER</h1>
+  <div id="authWidget" class="auth-widget"></div>
+</header>
+<main class="answers-main">
+  <div id="answersRoot"></div>
+</main>
+<script src="/data/spelling-bee/dictionary/dict-1-A-D.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-2-E-I.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-3-J-N.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-4-O-R.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-5-S-U.js"></script>
+<script src="/data/spelling-bee/dictionary/dict-6-V-Z.js"></script>
+<script src="/data/spelling-bee/puzzles.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/puzzle-loader.js"></script>
+<script src="/shared/daily.js"></script>
+<script src="/shared/answers.js"></script>
+<script>
+  function formatBee(p) {
+    const letters = [p.center, ...p.outerLetters];
+    const letterSet = new Set(letters);
+    const pangrams = window.SPELLING_BEE_DICTIONARY.filter(w =>
+      [...w].every(ch => letterSet.has(ch)) && letters.every(l => w.includes(l))
+    );
+    return 'Letters: <span class="mono-answer">' + letters.slice().sort().join("") + "</span> (center: " +
+      '<span class="mono-answer">' + p.center + "</span>)<br>Pangram" + (pangrams.length === 1 ? "" : "s") + ": " +
+      (pangrams.length ? pangrams.join(", ") : "none found");
+  }
+  window.PuzzleData.ready("spellingbee").then(function () {
+    window.AnswersPage.render({
+      game: "spellingbee",
+      gameName: "Spelling Bee",
+      playHref: "/spellingbee/index.html",
+      archiveHref: "/spellingbee/answers/",
+      onlyToday: true,
+      getAnswerForDay: function (day) {
+        const idx = window.DailyPuzzle.indexForDay(day, window.SPELLING_BEE_DATA.length);
+        return formatBee(window.SPELLING_BEE_DATA[idx]);
+      }
+    });
+  });
+</script>
+</body>
+</html>

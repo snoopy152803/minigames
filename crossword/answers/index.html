@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Crossword Answers</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/style.css">
+<link rel="stylesheet" href="/shared/answers.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="/crossword/index.html">&larr; Crossword</a>
+  <h1>CROSSWORD ANSWERS</h1>
+  <div id="authWidget" class="auth-widget"></div>
+</header>
+<main class="answers-main">
+  <div id="answersRoot"></div>
+</main>
+<script src="/data/crossword/short-fillers.js"></script>
+<script src="/data/crossword/medium.js"></script>
+<script src="/data/crossword/hard.js"></script>
+<script src="/crossword/generator.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/puzzle-loader.js"></script>
+<script src="/shared/daily.js"></script>
+<script src="/shared/seedrandom.js"></script>
+<script src="/shared/answers.js"></script>
+<script>
+  function formatCrossword(day) {
+    const rand = window.makeSeededRandom(day + 1);
+    const puzzle = window.CrosswordGenerator.generate(window.CROSSWORD_DATA, { targetCount: 10, rand });
+    if (!puzzle) return "(couldn't regenerate this day's puzzle)";
+    const line = (w) => w.number + (w.dir === "across" ? "A" : "D") + " " + w.clue + ": <span class=\"mono-answer\">" + w.word + "</span>";
+    return [...puzzle.across, ...puzzle.down]
+      .sort((a, b) => a.number - b.number)
+      .map(w => '<div>' + line(w) + '</div>')
+      .join("");
+  }
+  window.PuzzleData.ready("crossword").then(function () {
+    window.AnswersPage.render({
+      game: "crossword",
+      gameName: "Crossword",
+      playHref: "/crossword/index.html",
+      getAnswerForDay: formatCrossword
+    });
+  });
+</script>
+</body>
+</html>

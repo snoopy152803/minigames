@@ -6,6 +6,7 @@ window.PuzzleData.ready("connections").then(function () {
 
   const MAX_MISTAKES = 4;
   let puzzle = null;
+  let isDaily = false;
   let tiles = [];       // [{word, category, color}]
   let solved = [];      // categories already solved, in solve order
   let selected = [];    // currently selected words
@@ -27,9 +28,13 @@ window.PuzzleData.ready("connections").then(function () {
     return a;
   }
 
-  function newGame() {
+  function newGame(random) {
     const list = window.CONNECTIONS_DATA;
-    puzzle = list[Math.floor(Math.random() * list.length)];
+    isDaily = !random;
+    const idx = random
+      ? Math.floor(Math.random() * list.length)
+      : window.DailyPuzzle.indexForDay(window.DailyPuzzle.dayNumber(), list.length);
+    puzzle = list[idx];
     tiles = shuffle(puzzle.groups.flatMap(g => g.words.map(w => ({ word: w, category: g.category, color: g.color }))));
     solved = [];
     selected = [];
@@ -81,6 +86,7 @@ window.PuzzleData.ready("connections").then(function () {
       if (solved.length === puzzle.groups.length) {
         over = true;
         setTimeout(() => toast("You found all four groups!", 3000), 300);
+        if (isDaily) window.DailyPuzzle.markCompleted("connections");
       }
       render();
       return;
@@ -97,6 +103,7 @@ window.PuzzleData.ready("connections").then(function () {
       toast("Out of guesses! The word was in: " + puzzle.groups.map(g => g.category).join(", "), 4000);
       solved = puzzle.groups.slice();
       tiles = [];
+      if (isDaily) window.DailyPuzzle.markCompleted("connections");
       render();
     } else {
       toast(closeGroup ? "One away!" : "Not a group");
@@ -106,7 +113,7 @@ window.PuzzleData.ready("connections").then(function () {
   document.getElementById("submitBtn").addEventListener("click", submit);
   document.getElementById("deselectBtn").addEventListener("click", () => { selected = []; render(); });
   document.getElementById("shuffleBtn").addEventListener("click", () => { tiles = shuffle(tiles); render(); });
-  document.getElementById("newPuzzleBtn").addEventListener("click", newGame);
+  document.getElementById("newPuzzleBtn").addEventListener("click", () => newGame(true));
 
-  newGame();
+  newGame(false);
 });

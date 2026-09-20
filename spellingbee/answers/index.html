@@ -2,37 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Spelling Bee</title>
+<title>Spelling Bee Answers</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
 <link rel="stylesheet" href="/shared/style.css">
-<link rel="stylesheet" href="/spellingbee/style.css">
+<link rel="stylesheet" href="/shared/answers.css">
 </head>
 <body>
 <header class="topbar">
-  <a class="home-link" href="/index.html">&larr; Hub</a>
-  <h1>SPELLING BEE</h1>
+  <a class="home-link" href="/spellingbee/index.html">&larr; Spelling Bee</a>
+  <h1>SPELLING BEE ANSWERS</h1>
   <div id="authWidget" class="auth-widget"></div>
-  <a class="home-link" href="/spellingbee/answers/">Answers</a>
-  <button id="newPuzzleBtn" class="primary" style="padding:6px 12px;font-size:12px;">New puzzle</button>
 </header>
-<main>
-  <div class="bee-top">
-    <div class="bee-rank" id="rankLabel">Beginner</div>
-    <div class="bee-progress"><div class="bee-progress-fill" id="progressFill"></div></div>
-    <div class="bee-score" id="scoreLabel">0 pts</div>
-  </div>
-  <div class="bee-current" id="currentWord">&nbsp;</div>
-  <div id="hive" class="bee-hive"></div>
-  <div class="bee-buttons">
-    <button id="deleteBtn" class="primary">Delete</button>
-    <button id="shuffleBtn" class="primary">Shuffle</button>
-    <button id="enterBtn" class="primary">Enter</button>
-  </div>
-  <button id="toggleFound" class="secondary" type="button" style="margin-top:20px;">Found words (<span id="foundCount">0</span>)</button>
-  <div id="foundList" class="bee-found" style="display:none;"></div>
+<main class="answers-main">
+  <div id="answersRoot"></div>
 </main>
-<div id="toast" class="message-toast"></div>
 <script src="/data/spelling-bee/dictionary/dict-1-A-D.js"></script>
 <script src="/data/spelling-bee/dictionary/dict-2-E-I.js"></script>
 <script src="/data/spelling-bee/dictionary/dict-3-J-N.js"></script>
@@ -47,6 +31,29 @@
 <script src="/shared/auth.js"></script>
 <script src="/shared/puzzle-loader.js"></script>
 <script src="/shared/daily.js"></script>
-<script src="/spellingbee/script.js"></script>
+<script src="/shared/answers.js"></script>
+<script>
+  function formatBee(p) {
+    const letters = [p.center, ...p.outerLetters];
+    const letterSet = new Set(letters);
+    const pangrams = window.SPELLING_BEE_DICTIONARY.filter(w =>
+      [...w].every(ch => letterSet.has(ch)) && letters.every(l => w.includes(l))
+    );
+    return 'Letters: <span class="mono-answer">' + letters.slice().sort().join("") + "</span> (center: " +
+      '<span class="mono-answer">' + p.center + "</span>)<br>Pangram" + (pangrams.length === 1 ? "" : "s") + ": " +
+      (pangrams.length ? pangrams.join(", ") : "none found");
+  }
+  window.PuzzleData.ready("spellingbee").then(function () {
+    window.AnswersPage.render({
+      game: "spellingbee",
+      gameName: "Spelling Bee",
+      playHref: "/spellingbee/index.html",
+      getAnswerForDay: function (day) {
+        const idx = window.DailyPuzzle.indexForDay(day, window.SPELLING_BEE_DATA.length);
+        return formatBee(window.SPELLING_BEE_DATA[idx]);
+      }
+    });
+  });
+</script>
 </body>
 </html>

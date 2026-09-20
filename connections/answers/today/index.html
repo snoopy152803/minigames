@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Today's Connections Answer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/style.css">
+<link rel="stylesheet" href="/shared/answers.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="home-link" href="/connections/index.html">&larr; Connections</a>
+  <h1>TODAY'S ANSWER</h1>
+  <div id="authWidget" class="auth-widget"></div>
+</header>
+<main class="answers-main">
+  <div id="answersRoot"></div>
+</main>
+<script src="/data/connections/puzzles.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+<script src="/shared/firebase-config.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/puzzle-loader.js"></script>
+<script src="/shared/daily.js"></script>
+<script src="/shared/answers.js"></script>
+<script>
+  function formatConnections(p) {
+    return p.groups.map(g =>
+      '<div class="conn-answer-group"><b>' + g.category + ':</b> ' + g.words.join(", ") + '</div>'
+    ).join("");
+  }
+  window.PuzzleData.ready("connections").then(function () {
+    window.AnswersPage.render({
+      game: "connections",
+      gameName: "Connections",
+      playHref: "/connections/index.html",
+      archiveHref: "/connections/answers/",
+      onlyToday: true,
+      getAnswerForDay: function (day) {
+        const idx = window.DailyPuzzle.indexForDay(day, window.CONNECTIONS_DATA.length);
+        return formatConnections(window.CONNECTIONS_DATA[idx]);
+      }
+    });
+  });
+</script>
+</body>
+</html>

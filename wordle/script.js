@@ -4,16 +4,11 @@ window.PuzzleData.ready("wordle").then(function () {
   const WORD_LEN = 5;
   const MAX_GUESSES = 6;
 
-  function dailyIndex() {
-    const now = new Date();
-    const days = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(2024, 0, 1)) / 86400000);
-    return ((days % ANSWERS.length) + ANSWERS.length) % ANSWERS.length;
-  }
-
   let answer = "";
   let guesses = [];
   let current = "";
   let gameOver = false;
+  let isDaily = false;
   const keyStates = {};
 
   const boardEl = document.getElementById("board");
@@ -27,9 +22,10 @@ window.PuzzleData.ready("wordle").then(function () {
   }
 
   function newGame(random) {
+    isDaily = !random;
     answer = random
       ? ANSWERS[Math.floor(Math.random() * ANSWERS.length)]
-      : ANSWERS[dailyIndex()];
+      : ANSWERS[window.DailyPuzzle.indexForDay(window.DailyPuzzle.dayNumber(), ANSWERS.length)];
     guesses = [];
     current = "";
     gameOver = false;
@@ -136,6 +132,7 @@ window.PuzzleData.ready("wordle").then(function () {
       gameOver = true;
       setTimeout(() => toast("The word was " + answer, 3500), 300);
     }
+    if (gameOver && isDaily) window.DailyPuzzle.markCompleted("wordle");
     current = "";
   }
 

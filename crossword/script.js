@@ -9,6 +9,7 @@ window.PuzzleData.ready("crossword").then(function () {
   let inputs = [];
   let cellWordMap = []; // [r][c] = { across: entry|null, down: entry|null }
   let current = { dir: "across", entry: null };
+  let isDaily = false;
 
   function toast(msg, ms = 1800) {
     toastEl.textContent = msg;
@@ -16,11 +17,13 @@ window.PuzzleData.ready("crossword").then(function () {
     setTimeout(() => toastEl.classList.remove("show"), ms);
   }
 
-  function buildPuzzle() {
-    puzzle = window.CrosswordGenerator.generate(window.CROSSWORD_DATA, { targetCount: 10 });
+  function buildPuzzle(random) {
+    isDaily = !random;
+    const rand = random ? Math.random : window.makeSeededRandom(window.DailyPuzzle.dayNumber() + 1);
+    puzzle = window.CrosswordGenerator.generate(window.CROSSWORD_DATA, { targetCount: 10, rand });
     if (!puzzle) {
       toast("Generation failed, retrying...");
-      setTimeout(buildPuzzle, 50);
+      setTimeout(() => buildPuzzle(random), 50);
       return;
     }
     render();
@@ -200,6 +203,7 @@ window.PuzzleData.ready("crossword").then(function () {
     const totalLetters = puzzle.grid.flat().filter(Boolean).length;
     if (correctCount === totalLetters) {
       toast("Solved! Nice work.", 3000);
+      if (isDaily) window.DailyPuzzle.markCompleted("crossword");
     } else {
       toast(correctCount + " / " + filled + " filled letters correct");
     }
@@ -216,12 +220,13 @@ window.PuzzleData.ready("crossword").then(function () {
       }
     }
     toast("Puzzle revealed");
+    if (isDaily) window.DailyPuzzle.markCompleted("crossword");
   });
 
   document.getElementById("newPuzzleBtn").addEventListener("click", () => {
     puzzle = null;
-    buildPuzzle();
+    buildPuzzle(true);
   });
 
-  buildPuzzle();
+  buildPuzzle(false);
 });

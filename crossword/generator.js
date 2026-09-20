@@ -5,10 +5,10 @@ window.CrosswordGenerator = (function () {
   const CANVAS = 21;
   const CENTER = Math.floor(CANVAS / 2);
 
-  function shuffle(arr) {
+  function shuffle(arr, rand) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(rand() * (i + 1));
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
@@ -61,7 +61,7 @@ window.CrosswordGenerator = (function () {
     }
   }
 
-  function findPlacement(grid, word, placedWords) {
+  function findPlacement(grid, word, placedWords, rand) {
     const candidates = [];
     for (const pw of placedWords) {
       for (let i = 0; i < pw.word.length; i++) {
@@ -83,17 +83,18 @@ window.CrosswordGenerator = (function () {
         }
       }
     }
-    return candidates.length ? candidates[Math.floor(Math.random() * candidates.length)] : null;
+    return candidates.length ? candidates[Math.floor(rand() * candidates.length)] : null;
   }
 
   function generate(database, opts) {
     opts = opts || {};
     const targetCount = opts.targetCount || 12;
-    const pool = shuffle(database.filter(e => e.word.length >= 3 && e.word.length <= 14));
+    const rand = opts.rand || Math.random;
+    const pool = shuffle(database.filter(e => e.word.length >= 3 && e.word.length <= 14), rand);
 
     for (let attempt = 0; attempt < 25; attempt++) {
       const grid = makeGrid();
-      const shuffled = shuffle(pool);
+      const shuffled = shuffle(pool, rand);
       const sorted = shuffled.sort((a, b) => b.word.length - a.word.length).slice(0, Math.min(40, shuffled.length));
       const first = sorted[0];
       const startCol = CENTER - Math.floor(first.word.length / 2);
@@ -103,7 +104,7 @@ window.CrosswordGenerator = (function () {
       for (let i = 1; i < sorted.length && placedWords.length < targetCount; i++) {
         const entry = sorted[i];
         if (placedWords.some(p => p.word === entry.word)) continue;
-        const placement = findPlacement(grid, entry.word, placedWords);
+        const placement = findPlacement(grid, entry.word, placedWords, rand);
         if (placement) {
           place(grid, entry.word, placement.r, placement.c, placement.dir);
           placedWords.push({ word: entry.word, clue: entry.clue, row: placement.r, col: placement.c, dir: placement.dir });

@@ -27,6 +27,7 @@ window.PuzzleData.ready("spellingbee").then(function () {
   let validWords = [], maxScore = 0;
   let found = [];
   let current = "";
+  let isDaily = false;
 
   function toast(msg, ms = 1500) {
     toastEl.textContent = msg;
@@ -59,9 +60,11 @@ window.PuzzleData.ready("spellingbee").then(function () {
 
   function newGame(random) {
     const list = window.SPELLING_BEE_DATA;
-    const puzzle = random
-      ? list[Math.floor(Math.random() * list.length)]
-      : list[dailyIndex(list.length)];
+    isDaily = !random;
+    const idx = random
+      ? Math.floor(Math.random() * list.length)
+      : window.DailyPuzzle.indexForDay(window.DailyPuzzle.dayNumber(), list.length);
+    const puzzle = list[idx];
     center = puzzle.center;
     outer = puzzle.outerLetters.slice();
     allLetters = [center, ...outer];
@@ -70,12 +73,6 @@ window.PuzzleData.ready("spellingbee").then(function () {
     found = [];
     current = "";
     render();
-  }
-
-  function dailyIndex(len) {
-    const now = new Date();
-    const days = Math.floor((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(2024, 0, 1)) / 86400000);
-    return ((days % len) + len) % len;
   }
 
   function shuffleOuter() {
@@ -153,7 +150,9 @@ window.PuzzleData.ready("spellingbee").then(function () {
     if (!DICTIONARY.has(word)) { toast("Not in word list"); shakeMsg(); current = ""; renderCurrent(); return; }
     found.push(word);
     current = "";
-    toast(isPangram(word) ? "Pangram! +" + wordScore(word) : "+" + wordScore(word));
+    const gotPangram = isPangram(word);
+    toast(gotPangram ? "Pangram! +" + wordScore(word) : "+" + wordScore(word));
+    if (gotPangram && isDaily) window.DailyPuzzle.markCompleted("spellingbee");
     render();
   }
 

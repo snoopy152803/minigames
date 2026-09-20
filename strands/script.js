@@ -6,6 +6,7 @@ window.PuzzleData.ready("strands").then(function () {
   const lineLayer = document.getElementById("lineLayer");
 
   let board = null;
+  let isDaily = false;
   let foundWords = new Set();
   let selecting = false;   // a selection sequence is in progress (may span multiple taps)
   let dragging = false;    // pointer button is currently held down
@@ -19,18 +20,23 @@ window.PuzzleData.ready("strands").then(function () {
     setTimeout(() => toastEl.classList.remove("show"), ms);
   }
 
-  function pickPuzzle() {
+  function pickPuzzle(random) {
     const list = window.STRANDS_DATA;
-    return list[Math.floor(Math.random() * list.length)];
+    isDaily = !random;
+    const idx = random
+      ? Math.floor(Math.random() * list.length)
+      : window.DailyPuzzle.indexForDay(window.DailyPuzzle.dayNumber(), list.length);
+    return list[idx];
   }
 
-  function buildBoard() {
+  function buildBoard(random) {
+    const puzzle = pickPuzzle(random);
     for (let tries = 0; tries < 5 && !board; tries++) {
-      board = window.StrandsGenerator.generate(pickPuzzle());
+      board = window.StrandsGenerator.generate(puzzle);
     }
     if (!board) {
       toast("Could not generate puzzle, retrying...");
-      setTimeout(buildBoard, 50);
+      setTimeout(() => buildBoard(random), 50);
       return;
     }
     foundWords = new Set();
@@ -123,6 +129,7 @@ window.PuzzleData.ready("strands").then(function () {
         renderProgress();
         if (foundWords.size === board.words.length + 1) {
           setTimeout(() => toast("Puzzle complete!", 3000), 400);
+          if (isDaily) window.DailyPuzzle.markCompleted("strands");
         }
         resetSelection();
         return true;
@@ -240,8 +247,8 @@ window.PuzzleData.ready("strands").then(function () {
 
   document.getElementById("newPuzzleBtn").addEventListener("click", () => {
     board = null;
-    buildBoard();
+    buildBoard(true);
   });
 
-  buildBoard();
+  buildBoard(false);
 });
