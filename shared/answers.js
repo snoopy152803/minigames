@@ -3,7 +3,13 @@
 // Each game page supplies getAnswerForDay(day) using its own data/generator.
 window.AnswersPage = {
   render(opts) {
-    // opts: { game, gameName, playHref, archiveHref, onlyToday, historyDays, getAnswerForDay(day) }
+    // opts: { game, gameName, playHref, archiveHref, onlyToday, historyDays,
+    //         poolLength, getAnswerForDay(day) }
+    // poolLength (if given) is the size of the puzzle list this game picks
+    // from each day. The history window is capped to poolLength - 1 so the
+    // "previous answers" list can never reach far enough back to include a
+    // repeat of today's own puzzle (repeats happen no sooner than exactly
+    // poolLength days apart — see shared/daily.js).
     const container = document.getElementById("answersRoot");
     const day = window.DailyPuzzle.dayNumber();
     const completedToday = window.DailyPuzzle.isCompleted(opts.game, day);
@@ -22,7 +28,8 @@ window.AnswersPage = {
       html += '<p class="answer-archive-link"><a href="' + opts.archiveHref + '">See previous answers &rarr;</a></p>';
     } else {
       html += '<h2 class="answer-heading">Previous answers</h2><div class="answer-list">';
-      const n = opts.historyDays || 60;
+      let n = opts.historyDays || 60;
+      if (opts.poolLength) n = Math.min(n, opts.poolLength - 1);
       for (let i = 1; i <= n; i++) {
         const d = day - i;
         if (d < 0) break;

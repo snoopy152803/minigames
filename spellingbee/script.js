@@ -72,7 +72,18 @@ window.PuzzleData.ready("spellingbee").then(function () {
     maxScore = validWords.reduce((s, w) => s + wordScore(w), 0);
     found = [];
     current = "";
+
+    if (isDaily) {
+      const saved = window.DailyPuzzle.loadState("spellingbee");
+      if (saved && saved.center === center && Array.isArray(saved.found)) {
+        found = saved.found;
+      }
+    }
     render();
+  }
+
+  function saveDaily() {
+    if (isDaily) window.DailyPuzzle.saveState("spellingbee", { center, found });
   }
 
   function shuffleOuter() {
@@ -153,6 +164,7 @@ window.PuzzleData.ready("spellingbee").then(function () {
     const gotPangram = isPangram(word);
     toast(gotPangram ? "Pangram! +" + wordScore(word) : "+" + wordScore(word));
     if (gotPangram && isDaily) window.DailyPuzzle.markCompleted("spellingbee");
+    saveDaily();
     render();
   }
 

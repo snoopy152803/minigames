@@ -48,6 +48,7 @@
       game: "spellingbee",
       gameName: "Spelling Bee",
       playHref: "/spellingbee/index.html",
+      poolLength: window.SPELLING_BEE_DATA.length,
       getAnswerForDay: function (day) {
         const idx = window.DailyPuzzle.indexForDay(day, window.SPELLING_BEE_DATA.length);
         return formatBee(window.SPELLING_BEE_DATA[idx]);

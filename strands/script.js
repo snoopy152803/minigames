@@ -41,6 +41,32 @@ window.PuzzleData.ready("strands").then(function () {
     }
     foundWords = new Set();
     render();
+
+    if (isDaily) {
+      const saved = window.DailyPuzzle.loadState("strands");
+      if (saved && saved.theme === board.theme && Array.isArray(saved.found)) {
+        saved.found.forEach(word => markFound(word, /* silent */ true));
+        renderProgress();
+      }
+    }
+  }
+
+  function saveDaily() {
+    if (isDaily) window.DailyPuzzle.saveState("strands", { theme: board.theme, found: [...foundWords] });
+  }
+
+  // Marks a word (already known-correct) found: colors its cells and adds it
+  // to foundWords. Used both live (from checkSelection) and when restoring
+  // today's saved progress on page load.
+  function markFound(word, silent) {
+    const path = board.paths[word];
+    if (!path || foundWords.has(word)) return;
+    foundWords.add(word);
+    const cls = word === board.spangram ? "found-spangram" : "found-theme";
+    path.forEach(([r, c]) => cellEls[r][c] && cellEls[r][c].classList.add(cls));
+    if (!silent) {
+      toast(word === board.spangram ? "SPANGRAM! " + word : "Found: " + word);
+    }
   }
 
   function render() {
@@ -106,36 +132,32 @@ window.PuzzleData.ready("strands").then(function () {
     return Math.abs(a[0] - b[0]) <= 1 && Math.abs(a[1] - b[1]) <= 1 && !(a[0] === b[0] && a[1] === b[1]);
   }
 
-  function cellKey(rc) { return rc[0] + "," + rc[1]; }
-
-  function pathsEqual(a, b) {
-    if (a.length !== b.length) return false;
-    return a.every((rc, i) => rc[0] === b[i][0] && rc[1] === b[i][1]);
-  }
-
-  // Returns true if the current selectedPath exactly matches an unfound word
-  // (forwards or backwards) and, if so, marks it found and resets selection.
+  // Returns true if the letters spelled out by the current selectedPath
+  // (forwards or backwards) match an unfound word, and if so, marks it found
+  // using the path the player actually traced. Deliberately does NOT require
+  // selectedPath to match the generator's own stored solution path: the grid
+  // is filled with letters drawn from the puzzle's own word list, so a word
+  // can legitimately be spellable via more than one adjacent route, and any
+  // of them should count.
   function checkSelection() {
-    const reversed = selectedPath.slice().reverse();
+    const forward = selectedPath.map(([r, c]) => board.grid[r][c]).join("");
+    const backward = forward.split("").reverse().join("");
     const candidates = [board.spangram, ...board.words].filter(w => !foundWords.has(w));
-    for (const word of candidates) {
-      const solPath = board.paths[word];
-      if (!solPath) continue;
-      if (pathsEqual(selectedPath, solPath) || pathsEqual(reversed, solPath)) {
-        foundWords.add(word);
-        const cls = word === board.spangram ? "found-spangram" : "found-theme";
-        selectedPath.forEach(([r, c]) => cellEls[r][c].classList.add(cls));
-        toast(word === board.spangram ? "SPANGRAM! " + word : "Found: " + word);
-        renderProgress();
-        if (foundWords.size === board.words.length + 1) {
-          setTimeout(() => toast("Puzzle complete!", 3000), 400);
-          if (isDaily) window.DailyPuzzle.markCompleted("strands");
-        }
-        resetSelection();
-        return true;
-      }
+    const word = candidates.find(w => w === forward || w === backward);
+    if (!word) return false;
+
+    foundWords.add(word);
+    const cls = word === board.spangram ? "found-spangram" : "found-theme";
+    selectedPath.forEach(([r, c]) => cellEls[r][c].classList.add(cls));
+    toast(word === board.spangram ? "SPANGRAM! " + word : "Found: " + word);
+    renderProgress();
+    saveDaily();
+    if (foundWords.size === board.words.length + 1) {
+      setTimeout(() => toast("Puzzle complete!", 3000), 400);
+      if (isDaily) window.DailyPuzzle.markCompleted("strands");
     }
-    return false;
+    resetSelection();
+    return true;
   }
 
   function clearSelectionStyles() {

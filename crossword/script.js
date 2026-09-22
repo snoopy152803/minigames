@@ -78,6 +78,24 @@ window.PuzzleData.ready("crossword").then(function () {
     const firstWord = puzzle.across[0];
     current = { dir: "across", entry: firstWord };
     focusCell(firstWord.row, firstWord.col);
+
+    if (isDaily) {
+      const saved = window.DailyPuzzle.loadState("crossword");
+      if (saved && saved.rows === puzzle.rows && saved.cols === puzzle.cols && Array.isArray(saved.values)) {
+        for (let r = 0; r < puzzle.rows; r++) {
+          for (let c = 0; c < puzzle.cols; c++) {
+            const val = saved.values[r] && saved.values[r][c];
+            if (val && inputs[r][c]) inputs[r][c].value = val;
+          }
+        }
+      }
+    }
+  }
+
+  function saveDaily() {
+    if (!isDaily) return;
+    const values = inputs.map(row => row.map(el => (el ? el.value : "")));
+    window.DailyPuzzle.saveState("crossword", { rows: puzzle.rows, cols: puzzle.cols, values });
   }
 
   function renderClueLists() {
@@ -157,6 +175,7 @@ window.PuzzleData.ready("crossword").then(function () {
     e.target.value = val.slice(-1);
     e.target.classList.remove("correct", "incorrect");
     if (val) moveNext(r, c);
+    saveDaily();
   }
 
   function onKeyDown(e, r, c) {
@@ -221,6 +240,7 @@ window.PuzzleData.ready("crossword").then(function () {
     }
     toast("Puzzle revealed");
     if (isDaily) window.DailyPuzzle.markCompleted("crossword");
+    saveDaily();
   });
 
   document.getElementById("newPuzzleBtn").addEventListener("click", () => {

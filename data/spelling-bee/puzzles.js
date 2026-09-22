@@ -198,6 +198,193 @@ window.SPELLING_BEE_DATA.push(...
       "M",
       "N"
     ]
+  },
+  {
+    "center": "R",
+    "outerLetters": [
+      "F",
+      "U",
+      "N",
+      "A",
+      "C",
+      "E"
+    ]
+  },
+  {
+    "center": "E",
+    "outerLetters": [
+      "U",
+      "P",
+      "G",
+      "R",
+      "A",
+      "D"
+    ]
+  },
+  {
+    "center": "T",
+    "outerLetters": [
+      "B",
+      "A",
+      "N",
+      "Q",
+      "U",
+      "E"
+    ]
+  },
+  {
+    "center": "S",
+    "outerLetters": [
+      "A",
+      "D",
+      "V",
+      "I",
+      "O",
+      "R"
+    ]
+  },
+  {
+    "center": "T",
+    "outerLetters": [
+      "O",
+      "U",
+      "L",
+      "I",
+      "N",
+      "E"
+    ]
+  },
+  {
+    "center": "E",
+    "outerLetters": [
+      "W",
+      "A",
+      "R",
+      "D",
+      "O",
+      "B"
+    ]
+  },
+  {
+    "center": "E",
+    "outerLetters": [
+      "P",
+      "L",
+      "U",
+      "N",
+      "G",
+      "R"
+    ]
+  },
+  {
+    "center": "A",
+    "outerLetters": [
+      "C",
+      "H",
+      "M",
+      "B",
+      "E",
+      "R"
+    ]
+  },
+  {
+    "center": "R",
+    "outerLetters": [
+      "F",
+      "O",
+      "T",
+      "U",
+      "N",
+      "E"
+    ]
+  },
+  {
+    "center": "E",
+    "outerLetters": [
+      "H",
+      "A",
+      "N",
+      "D",
+      "L",
+      "R"
+    ]
+  },
+  {
+    "center": "S",
+    "outerLetters": [
+      "I",
+      "M",
+      "P",
+      "U",
+      "L",
+      "E"
+    ]
+  },
+  {
+    "center": "O",
+    "outerLetters": [
+      "J",
+      "U",
+      "N",
+      "C",
+      "T",
+      "I"
+    ]
+  },
+  {
+    "center": "A",
+    "outerLetters": [
+      "M",
+      "I",
+      "L",
+      "B",
+      "O",
+      "X"
+    ]
+  },
+  {
+    "center": "L",
+    "outerLetters": [
+      "Q",
+      "U",
+      "A",
+      "I",
+      "F",
+      "Y"
+    ]
+  },
+  {
+    "center": "E",
+    "outerLetters": [
+      "T",
+      "U",
+      "R",
+      "B",
+      "I",
+      "N"
+    ]
+  },
+  {
+    "center": "R",
+    "outerLetters": [
+      "V",
+      "O",
+      "U",
+      "C",
+      "H",
+      "E"
+    ]
+  },
+  {
+    "center": "A",
+    "outerLetters": [
+      "E",
+      "X",
+      "P",
+      "L",
+      "I",
+      "N"
+    ]
   }
 ]
 );

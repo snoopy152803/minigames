@@ -40,7 +40,26 @@ window.PuzzleData.ready("connections").then(function () {
     selected = [];
     mistakes = 0;
     over = false;
+
+    if (isDaily) {
+      const saved = window.DailyPuzzle.loadState("connections");
+      if (saved) {
+        solved = puzzle.groups.filter(g => (saved.solvedCategories || []).includes(g.category));
+        tiles = tiles.filter(t => !solved.some(g => g.words.includes(t.word)));
+        mistakes = saved.mistakes || 0;
+        over = solved.length === puzzle.groups.length || mistakes >= MAX_MISTAKES;
+        if (over && solved.length !== puzzle.groups.length) {
+          // A past loss reveals everything, same as a live one.
+          solved = puzzle.groups.slice();
+          tiles = [];
+        }
+      }
+    }
     render();
+  }
+
+  function saveDaily() {
+    if (isDaily) window.DailyPuzzle.saveState("connections", { solvedCategories: solved.map(g => g.category), mistakes });
   }
 
   function render() {
@@ -88,6 +107,7 @@ window.PuzzleData.ready("connections").then(function () {
         setTimeout(() => toast("You found all four groups!", 3000), 300);
         if (isDaily) window.DailyPuzzle.markCompleted("connections");
       }
+      saveDaily();
       render();
       return;
     }
@@ -104,9 +124,11 @@ window.PuzzleData.ready("connections").then(function () {
       solved = puzzle.groups.slice();
       tiles = [];
       if (isDaily) window.DailyPuzzle.markCompleted("connections");
+      saveDaily();
       render();
     } else {
       toast(closeGroup ? "One away!" : "Not a group");
+      saveDaily();
     }
   }
 

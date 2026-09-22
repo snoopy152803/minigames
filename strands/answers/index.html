@@ -32,6 +32,7 @@
       game: "strands",
       gameName: "Strands",
       playHref: "/strands/index.html",
+      poolLength: window.STRANDS_DATA.length,
       getAnswerForDay: function (day) {
         const idx = window.DailyPuzzle.indexForDay(day, window.STRANDS_DATA.length);
         const p = window.STRANDS_DATA[idx];

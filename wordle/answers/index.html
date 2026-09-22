@@ -35,6 +35,7 @@
       game: "wordle",
       gameName: "Wordle",
       playHref: "/wordle/index.html",
+      poolLength: window.WORDLE_ANSWERS.length,
       getAnswerForDay: function (day) {
         const idx = window.DailyPuzzle.indexForDay(day, window.WORDLE_ANSWERS.length);
         return '<span class="mono-answer">' + window.WORDLE_ANSWERS[idx] + '</span>';

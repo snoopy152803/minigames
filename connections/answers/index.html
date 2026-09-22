@@ -37,6 +37,7 @@
       game: "connections",
       gameName: "Connections",
       playHref: "/connections/index.html",
+      poolLength: window.CONNECTIONS_DATA.length,
       getAnswerForDay: function (day) {
         const idx = window.DailyPuzzle.indexForDay(day, window.CONNECTIONS_DATA.length);
         return formatConnections(window.CONNECTIONS_DATA[idx]);

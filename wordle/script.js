@@ -30,7 +30,19 @@ window.PuzzleData.ready("wordle").then(function () {
     current = "";
     gameOver = false;
     for (const k in keyStates) delete keyStates[k];
+
+    if (isDaily) {
+      const saved = window.DailyPuzzle.loadState("wordle");
+      if (saved && saved.answer === answer) {
+        guesses = saved.guesses || [];
+        gameOver = !!saved.gameOver;
+      }
+    }
     render();
+  }
+
+  function saveDaily() {
+    if (isDaily) window.DailyPuzzle.saveState("wordle", { answer, guesses, gameOver });
   }
 
   function render() {
@@ -134,6 +146,7 @@ window.PuzzleData.ready("wordle").then(function () {
     }
     if (gameOver && isDaily) window.DailyPuzzle.markCompleted("wordle");
     current = "";
+    saveDaily();
   }
 
   document.addEventListener("keydown", (e) => {
